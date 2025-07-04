@@ -1,8 +1,13 @@
 import React from 'react';
 import { Clock, Users, Award, Play, CheckCircle, Lock } from 'lucide-react';
 import { quizzes } from '../../data/mockData';
+import { api, ENDPOINT } from '@/lib/api'; // Adjust the import path as necessary
+import { useEffect, useState } from 'react';
 
 const Quizzes = () => {
+  const [loading, setLoading] = useState(true);
+  const [quizzes, setQuizzes] = useState([]);
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'available': return 'bg-green-100 text-green-800';
@@ -20,6 +25,28 @@ const Quizzes = () => {
       default: return <Clock className="w-4 h-4" />;
     }
   };
+
+
+  useEffect(() => {
+    const fetchQuizzes = async () => {
+      try {
+        const response = await api.get(ENDPOINT.quizzes());
+        setQuizzes(response.data);
+      } catch (error) {
+        console.error("Failed to fetch quizzes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchQuizzes();
+  }, []);
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <p className="text-gray-500">Loading quizzes...</p>     
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

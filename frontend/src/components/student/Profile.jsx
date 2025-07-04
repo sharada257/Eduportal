@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import {
-  Card, CardContent, CardDescription, CardHeader, CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,15 +14,15 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { User, Edit, Calendar, BookOpen } from "lucide-react";
-import { api, ENDPOINT } from "@/lib/api";  // <-- adjust to your path
+import { api, ENDPOINT } from "@/lib/api"; // <-- adjust to your path
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState(null);  // Start with null
+  const [profile, setProfile] = useState(null); // Start with null
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const studentId = "ba2de7f2-0232-4318-a00d-13d93a3f9f93"; // <-- Replace with your dynamic ID if you have routing
+  const studentId = "308176de-092b-4e4e-b953-12c37dcbf65b"; // <-- Replace with your dynamic ID if you have routing
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -92,21 +96,30 @@ export default function Profile() {
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 w-full">
-            <h3 className="text-2xl font-bold">{profile.user.split("")
+            <h3 className="text-2xl font-bold">
+              {profile.user
+                .split("")
                 .map((n) => n[0])
                 .join("")
-                .toUpperCase()}</h3>
+                .toUpperCase()}
+            </h3>
             <p className="text-lg text-gray-600">{profile.program_type}</p>
             <p className="text-gray-500">Section: {profile.section}</p>
             <div className="flex flex-wrap items-center gap-3 mt-3">
-              <Badge variant="default">Register No: {profile.registerNumber}</Badge>
-              <Badge variant="secondary">Batch: {profile.admission_year} - {profile.batch_year}</Badge>
+              <Badge variant="default">
+                Register No: {profile.registerNumber}
+              </Badge>
+              <Badge variant="secondary">
+                Batch: {profile.admission_year} - {profile.batch_year}
+              </Badge>
             </div>
           </div>
           <div className="text-right min-w-fit">
             <div className="flex items-center gap-2 text-gray-600">
               <Calendar className="w-4 h-4" />
-              <span className="text-sm">Semester {profile.current_semester}</span>
+              <span className="text-sm">
+                Semester {profile.current_semester}
+              </span>
             </div>
           </div>
         </CardContent>
@@ -186,11 +199,15 @@ export default function Profile() {
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600">{profile.cgpa}</div>
+            <div className="text-2xl font-bold text-blue-600">
+              {profile.cgpa}
+            </div>
             <div className="text-sm text-gray-600">CGPA</div>
           </div>
           <div className="text-center p-4 bg-green-50 rounded-lg">
-            <div className="text-2xl font-bold text-green-600">{profile.sgpa_current}</div>
+            <div className="text-2xl font-bold text-green-600">
+              {profile.sgpa_current}
+            </div>
             <div className="text-sm text-gray-600">Current SGPA</div>
           </div>
           <div className="text-center p-4 bg-purple-50 rounded-lg">
