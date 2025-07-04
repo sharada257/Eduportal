@@ -30,7 +30,7 @@ const Quizzes = () => {
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
-        const response = await api.get(ENDPOINT.quizzes());
+        const response = await api.get(ENDPOINT.quizzes);
         setQuizzes(response.data);
       } catch (error) {
         console.error("Failed to fetch quizzes:", error);

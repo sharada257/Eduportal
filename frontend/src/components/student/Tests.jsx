@@ -40,7 +40,7 @@ const Tests = () => {
   useEffect(() => {
     const fetchtest = async () => {
       try {
-        const response = await api.get(ENDPOINT.tests());
+        const response = await api.get(ENDPOINT.tests);
         setTest(response.data);
       } catch (error) {
         console.error("Failed to fetch profile:", error);

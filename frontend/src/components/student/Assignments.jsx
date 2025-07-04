@@ -1,11 +1,43 @@
 "use client"
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import { Calendar, Clock, CheckCircle, AlertCircle, FileText } from 'lucide-react';
-import { assignments } from '../../data/mockData';
 import { useEffect} from 'react';
+import { api, ENDPOINT } from '@/lib/api'; // Adjust the import path as necessary
   
 const Assignments = () => {
+  const [assignments, setAssignments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
+
+  useEffect(() => {
+    const fetchAssignments = async () => {
+      try {   
+        const response = await api.get(ENDPOINT.assignments);
+        setAssignments(response.data);
+      } catch (error) {
+        console.error("Failed to fetch assignments:", error);
+        setError("Failed to load assignments. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAssignments();
+  }, []);
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <p className="text-gray-500">Loading assignments...</p>
+      </div>
+    );
+  }
+  if (error) {
+    return (      
+      <div className="flex justify-center items-center h-96">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
   
   const filteredAssignments = assignments.filter(assignment => {
     if (filter === 'all') return true;
