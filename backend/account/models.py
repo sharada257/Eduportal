@@ -1,13 +1,9 @@
-# app/models.py
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from department.models import Department,Section
 from django.utils import timezone
 from decimal import Decimal
-
-
-
 
 class UserTypeEnum(models.TextChoices):
     ADMIN = "Admin", "Admin"
