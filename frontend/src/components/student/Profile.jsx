@@ -69,13 +69,10 @@ export default function Profile() {
   }
 
   return (
-    <div className="space-y-6 pb-10">
+    <div className="space-y-2 w-full">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
         <div>
           <h2 className="text-3xl font-semibold mb-1">My Profile</h2>
-          <p className="text-gray-600 text-sm sm:text-base">
-            View and update your academic information
-          </p>
         </div>
         <Button
           variant="outline"
@@ -101,17 +98,12 @@ export default function Profile() {
                 .split("")
                 .map((n) => n[0])
                 .join("")
-                .toUpperCase()}
-            </h3>
-            <p className="text-lg text-gray-600">{profile.program_type}</p>
-            <p className="text-gray-500">Section: {profile.section}</p>
+                .toUpperCase()}</h3>
+            <p className="text-gray-500">USN : {profile.registration_number}</p>
+            <p className="text-gray-500">Section : {profile.section}</p>
             <div className="flex flex-wrap items-center gap-3 mt-3">
-              <Badge variant="default">
-                Register No: {profile.registerNumber}
-              </Badge>
-              <Badge variant="secondary">
-                Batch: {profile.admission_year} - {profile.batch_year}
-              </Badge>
+              <Badge variant="default">Batch : {profile.program_type}</Badge>
+              <Badge variant="secondary">Batch: {profile.admission_year} - {profile.batch_year}</Badge>
             </div>
           </div>
           <div className="text-right min-w-fit">
