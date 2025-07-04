@@ -1,2 +1,12 @@
 /venv
-
+/account/__pycache__
+/account/migrations/__pycache__
+/assessment/__pycache__
+/assessment/migrations/__pycache__
+/core/__pycache__
+/department/__pycache__
+/department/migrations/__pycache__
+/account/__pycache__
+/account/migrations/__pycache__
+/db.sqlite3
+/.env
