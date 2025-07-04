@@ -155,3 +155,4 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
     queryset = AdminProfile.objects.select_related('user', 'department', 'created_by', 'updated_by')
     serializer_class = AdminProfileSerializer
     permission_classes = [IsAuthenticated]
+

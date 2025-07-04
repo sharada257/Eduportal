@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from .models import Department, Section, Subject, SubjectTeacherSection
-from .serializers import DepartmentSerializer, SectionSerializer, SubjectSerializer, SubjectTeacherSectionSerializer
+from .models import Department, Section, Subject
+from .serializers import DepartmentSerializer, SectionSerializer, SubjectSerializer
 
 class DepartmentViewSet(viewsets.ModelViewSet):
     queryset = Department.objects.all()
@@ -13,7 +13,3 @@ class SectionViewSet(viewsets.ModelViewSet):
 class SubjectViewSet(viewsets.ModelViewSet):
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
-
-class SubjectTeacherSectionViewSet(viewsets.ModelViewSet):
-    queryset = SubjectTeacherSection.objects.all()
-    serializer_class = SubjectTeacherSectionSerializer

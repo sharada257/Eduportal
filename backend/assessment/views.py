@@ -1,8 +1,8 @@
 
 # views.py
 from rest_framework import viewsets, filters
-from .models import Assignment, Quiz, Test, Submission
-from .serializers import AssignmentSerializer, QuizSerializer, TestSerializer, SubmissionSerializer
+from .models import Assignment, Quiz, Test, Submission,SubjectTeacherSection
+from .serializers import AssignmentSerializer, QuizSerializer, TestSerializer, SubmissionSerializer, SubjectTeacherSectionSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 
 class AssignmentViewSet(viewsets.ModelViewSet):
@@ -36,3 +36,7 @@ class SubmissionViewSet(viewsets.ModelViewSet):
     filterset_fields = ['student', 'type', 'assignment', 'quiz', 'test']
     ordering_fields = ['submitted_at', 'obtained_marks']
 
+
+class SubjectTeacherSectionViewSet(viewsets.ModelViewSet):
+    queryset = SubjectTeacherSection.objects.all()
+    serializer_class = SubjectTeacherSectionSerializer

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Department, Section, Subject, SubjectTeacherSection
+from .models import Department, Section, Subject
 
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,9 +14,4 @@ class SectionSerializer(serializers.ModelSerializer):
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
-        fields = '__all__'
-
-class SubjectTeacherSectionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SubjectTeacherSection
         fields = '__all__'
