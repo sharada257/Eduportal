@@ -13,17 +13,17 @@ export const ENDPOINT = {
     subjectTeacherSections: "/subject-teacher-sections/",
     subjectTeacherSection: (id) => `/subject-teacher-sections/${id}/`,
 
-    assignments: "/api/assignments/",
-    assignment: (id) => `/api/assignments/${id}/`,
+    assignments: "/assignments/",
+    assignment: (id) => `/assignments/${id}/`,
 
-    quizzes: "/api/quizzes/",
-    quiz: (id) => `/api/quizzes/${id}/`,
+    quizzes: "/quizzes/",
+    quiz: (id) => `/quizzes/${id}/`,
 
-    tests: "/api/tests/",
-    test: (id) => `/api/tests/${id}/`,
+    tests: "/tests/",
+    test: (id) => `/test/${id}/`,
 
-    submissions: "/api/submissions/",
-    submission: (id) => `/api/submissions/${id}/`,
+    submissions: "/submisssions/",
+    submission: (id) => `/submissions/${id}/`,
 
     teachers: "/teachers/",
     teacher: (id) => `/teachers/${id}/`,

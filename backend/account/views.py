@@ -148,11 +148,9 @@ class TeacherProfileViewSet(viewsets.ModelViewSet):
 class StudentProfileViewSet(viewsets.ModelViewSet):
     queryset = StudentProfile.objects.select_related('user', 'section', 'created_by', 'updated_by')
     serializer_class = StudentProfileSerializer
-    permission_classes = [IsAuthenticated]
 
 
 class AdminProfileViewSet(viewsets.ModelViewSet):
     queryset = AdminProfile.objects.select_related('user', 'department', 'created_by', 'updated_by')
     serializer_class = AdminProfileSerializer
-    permission_classes = [IsAuthenticated]
 

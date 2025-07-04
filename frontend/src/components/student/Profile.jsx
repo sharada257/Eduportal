@@ -1,44 +1,83 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { User, Mail, Phone, MapPin, Calendar, Save, Edit, Building } from "lucide-react"
+import { useEffect, useState } from "react";
+import {
+  Card, CardContent, CardDescription, CardHeader, CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { User, Edit, Calendar, BookOpen } from "lucide-react";
+import { api, ENDPOINT } from "@/lib/api";  // <-- adjust to your path
 
 export default function Profile() {
-  const [isEditing, setIsEditing] = useState(false)
-  const [profile, setProfile] = useState({
-    name: "Dr. Sarah Wilson",
-    email: "sarah.wilson@university.edu",
-    phone: "+1 (555) 123-4567",
-    department: "Mathematics Department",
-    office: "Room 204, Science Building",
-    bio: "Professor of Mathematics with 15 years of teaching experience. Specializing in Calculus, Linear Algebra, and Mathematical Analysis.",
-    joinDate: "September 2019",
-    employeeId: "EMP001234",
-    title: "Professor",
-    specialization: "Mathematics",
-  })
+  const [isEditing, setIsEditing] = useState(false);
+  const [profile, setProfile] = useState(null);  // Start with null
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = () => {
-    // Here you would typically save to a backend
-    setIsEditing(false)
-    // Show success message
+  const studentId = "ba2de7f2-0232-4318-a00d-13d93a3f9f93"; // <-- Replace with your dynamic ID if you have routing
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await api.get(ENDPOINT.studentProfile(studentId));
+        setProfile(response.data);
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, [studentId]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.put(`/api/studentProfile/${studentId}/`, profile);
+      setIsEditing(false);
+      // Optional: Show toast/notification of success
+    } catch (error) {
+      console.error("Failed to save profile:", error);
+      // Optional: Show error toast
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <p className="text-gray-500">Loading profile...</p>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <p className="text-red-500">Profile not found.</p>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6 pb-10">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
         <div>
-          <h2 className="text-2xl font-semibold">My Profile</h2>
-          <p className="text-gray-600">Manage your personal and professional information</p>
+          <h2 className="text-3xl font-semibold mb-1">My Profile</h2>
+          <p className="text-gray-600 text-sm sm:text-base">
+            View and update your academic information
+          </p>
         </div>
-        <Button variant="outline" onClick={() => setIsEditing(!isEditing)} className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          onClick={() => setIsEditing(!isEditing)}
+          className="flex items-center gap-2 mt-4 sm:mt-0"
+        >
           <Edit className="w-4 h-4" />
           {isEditing ? "Cancel" : "Edit Profile"}
         </Button>
@@ -46,198 +85,119 @@ export default function Profile() {
 
       {/* Profile Header */}
       <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-6">
-            <Avatar className="w-20 h-20">
-              <AvatarFallback className="text-xl font-semibold">SW</AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <h3 className="text-2xl font-bold">{profile.name}</h3>
-              <p className="text-lg text-gray-600">{profile.title}</p>
-              <p className="text-gray-500">{profile.department}</p>
-              <div className="flex items-center gap-3 mt-3">
-                <Badge variant="default">{profile.title}</Badge>
-                <Badge variant="secondary">{profile.specialization}</Badge>
-                <Badge variant="outline">Employee ID: {profile.employeeId}</Badge>
-              </div>
+        <CardContent className="p-6 flex flex-col sm:flex-row gap-6 items-center">
+          <Avatar className="w-20 h-20">
+            <AvatarFallback className="text-xl font-semibold">
+              {profile.user[0]}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 w-full">
+            <h3 className="text-2xl font-bold">{profile.user.split("")
+                .map((n) => n[0])
+                .join("")
+                .toUpperCase()}</h3>
+            <p className="text-lg text-gray-600">{profile.program_type}</p>
+            <p className="text-gray-500">Section: {profile.section}</p>
+            <div className="flex flex-wrap items-center gap-3 mt-3">
+              <Badge variant="default">Register No: {profile.registerNumber}</Badge>
+              <Badge variant="secondary">Batch: {profile.admission_year} - {profile.batch_year}</Badge>
             </div>
-            <div className="text-right">
-              <div className="flex items-center gap-2 text-gray-600 mb-2">
-                <Calendar className="w-4 h-4" />
-                <span className="text-sm">Joined {profile.joinDate}</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600">
-                <MapPin className="w-4 h-4" />
-                <span className="text-sm">{profile.office}</span>
-              </div>
+          </div>
+          <div className="text-right min-w-fit">
+            <div className="flex items-center gap-2 text-gray-600">
+              <Calendar className="w-4 h-4" />
+              <span className="text-sm">Semester {profile.current_semester}</span>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Profile Details */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Personal Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="w-5 h-5" />
-              Personal Information
-            </CardTitle>
-            <CardDescription>Your basic personal details</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                value={profile.name}
-                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                disabled={!isEditing}
-                className={!isEditing ? "bg-gray-50" : ""}
-              />
-            </div>
-            <div>
-              <Label htmlFor="email">Email Address</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  id="email"
-                  type="email"
-                  value={profile.email}
-                  onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                  disabled={!isEditing}
-                  className={`pl-10 ${!isEditing ? "bg-gray-50" : ""}`}
-                />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="phone">Phone Number</Label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  id="phone"
-                  value={profile.phone}
-                  onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                  disabled={!isEditing}
-                  className={`pl-10 ${!isEditing ? "bg-gray-50" : ""}`}
-                />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="office">Office Location</Label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  id="office"
-                  value={profile.office}
-                  onChange={(e) => setProfile({ ...profile, office: e.target.value })}
-                  disabled={!isEditing}
-                  className={`pl-10 ${!isEditing ? "bg-gray-50" : ""}`}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Professional Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Building className="w-5 h-5" />
-              Professional Information
-            </CardTitle>
-            <CardDescription>Your academic and professional details</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="title">Job Title</Label>
-              <Input
-                id="title"
-                value={profile.title}
-                onChange={(e) => setProfile({ ...profile, title: e.target.value })}
-                disabled={!isEditing}
-                className={!isEditing ? "bg-gray-50" : ""}
-              />
-            </div>
-            <div>
-              <Label htmlFor="department">Department</Label>
-              <Input
-                id="department"
-                value={profile.department}
-                onChange={(e) => setProfile({ ...profile, department: e.target.value })}
-                disabled={!isEditing}
-                className={!isEditing ? "bg-gray-50" : ""}
-              />
-            </div>
-            <div>
-              <Label htmlFor="specialization">Specialization</Label>
-              <Input
-                id="specialization"
-                value={profile.specialization}
-                onChange={(e) => setProfile({ ...profile, specialization: e.target.value })}
-                disabled={!isEditing}
-                className={!isEditing ? "bg-gray-50" : ""}
-              />
-            </div>
-            <div>
-              <Label htmlFor="employeeId">Employee ID</Label>
-              <Input id="employeeId" value={profile.employeeId} disabled className="bg-gray-50" />
-            </div>
-            <div>
-              <Label htmlFor="joinDate">Join Date</Label>
-              <Input id="joinDate" value={profile.joinDate} disabled className="bg-gray-50" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Bio Section */}
+      {/* Academic Information */}
       <Card>
         <CardHeader>
-          <CardTitle>Professional Bio</CardTitle>
-          <CardDescription>Tell others about your background and expertise</CardDescription>
+          <CardTitle className="flex items-center gap-2">
+            <BookOpen className="w-5 h-5" />
+            Academic Information
+          </CardTitle>
+          <CardDescription>Your detailed academic records</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div>
-            <Label htmlFor="bio">Biography</Label>
-            <Textarea
-              id="bio"
-              value={profile.bio}
-              onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-              disabled={!isEditing}
-              rows={6}
-              className={!isEditing ? "bg-gray-50" : ""}
-              placeholder="Write a brief description about your professional background, expertise, and teaching philosophy..."
-            />
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <Label htmlFor="admission_year">Admission Year</Label>
+              <Input
+                id="admission_year"
+                type="number"
+                value={profile.admission_year}
+                onChange={(e) =>
+                  setProfile({ ...profile, admission_year: e.target.value })
+                }
+                disabled={!isEditing}
+                className={!isEditing ? "bg-gray-50" : ""}
+              />
+            </div>
+            <div>
+              <Label htmlFor="batch_year">Batch Year</Label>
+              <Input
+                id="batch_year"
+                type="number"
+                value={profile.batch_year}
+                onChange={(e) =>
+                  setProfile({ ...profile, batch_year: e.target.value })
+                }
+                disabled={!isEditing}
+                className={!isEditing ? "bg-gray-50" : ""}
+              />
+            </div>
+            <div>
+              <Label htmlFor="current_semester">Current Semester</Label>
+              <Input
+                id="current_semester"
+                type="number"
+                value={profile.current_semester}
+                onChange={(e) =>
+                  setProfile({ ...profile, current_semester: e.target.value })
+                }
+                disabled={!isEditing}
+                className={!isEditing ? "bg-gray-50" : ""}
+              />
+            </div>
+            <div>
+              <Label htmlFor="program_type">Program Type</Label>
+              <Input
+                id="program_type"
+                value={profile.program_type}
+                onChange={(e) =>
+                  setProfile({ ...profile, program_type: e.target.value })
+                }
+                disabled={!isEditing}
+                className={!isEditing ? "bg-gray-50" : ""}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Teaching Statistics */}
+      {/* Academic Performance */}
       <Card>
         <CardHeader>
-          <CardTitle>Teaching Statistics</CardTitle>
-          <CardDescription>Your teaching performance overview</CardDescription>
+          <CardTitle>Academic Performance</CardTitle>
+          <CardDescription>Monitor your grades and credits</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">3</div>
-              <div className="text-sm text-gray-600">Active Courses</div>
+        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="text-center p-4 bg-blue-50 rounded-lg">
+            <div className="text-2xl font-bold text-blue-600">{profile.cgpa}</div>
+            <div className="text-sm text-gray-600">CGPA</div>
+          </div>
+          <div className="text-center p-4 bg-green-50 rounded-lg">
+            <div className="text-2xl font-bold text-green-600">{profile.sgpa_current}</div>
+            <div className="text-sm text-gray-600">Current SGPA</div>
+          </div>
+          <div className="text-center p-4 bg-purple-50 rounded-lg">
+            <div className="text-lg font-bold text-purple-600">
+              {profile.total_credits_completed}/{profile.total_credits_required}
             </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">65</div>
-              <div className="text-sm text-gray-600">Total Students</div>
-            </div>
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600">4.8</div>
-              <div className="text-sm text-gray-600">Avg. Rating</div>
-            </div>
-            <div className="text-center p-4 bg-orange-50 rounded-lg">
-              <div className="text-2xl font-bold text-orange-600">15</div>
-              <div className="text-sm text-gray-600">Years Experience</div>
-            </div>
+            <div className="text-sm text-gray-600">Credits Completed</div>
           </div>
         </CardContent>
       </Card>
@@ -247,9 +207,12 @@ export default function Profile() {
         <Card>
           <CardContent className="p-4">
             <div className="flex gap-2">
-              <Button onClick={handleSave} className="flex items-center gap-2">
-                <Save className="w-4 h-4" />
-                Save Changes
+              <Button
+                onClick={handleSave}
+                disabled={saving}
+                className="flex items-center gap-2"
+              >
+                {saving ? "Saving..." : "Save Changes"}
               </Button>
               <Button variant="outline" onClick={() => setIsEditing(false)}>
                 Cancel
@@ -259,5 +222,5 @@ export default function Profile() {
         </Card>
       )}
     </div>
-  )
+  );
 }
