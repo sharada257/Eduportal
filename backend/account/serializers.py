@@ -1,6 +1,11 @@
 # app/serializers.py
 from rest_framework import serializers
 from .models import User
+from .models import StudentProfile, AdminProfile
+from .models import TeacherProfile, User
+
+
+
 
 class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,7 +28,11 @@ class UserSummarySerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'first_name', 'last_name', 'user_type']
 
 
-from .models import TeacherProfile, User
+class TeacherProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeacherProfile
+        fields = '__all__'
+
 
 class TeacherProfileCreateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -51,12 +60,6 @@ class TeacherProfileAPIResponseSerializer(serializers.Serializer):
     success = serializers.BooleanField()
     message = serializers.CharField()
     data = TeacherProfileDetailSerializer()
-
-
-# app/serializers.py
-
-from rest_framework import serializers
-from .models import StudentProfile, AdminProfile
 
 
 class StudentProfileSerializer(serializers.ModelSerializer):

@@ -1,29 +1,21 @@
-# app/views.py
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 
-# app/views.py
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from django.db.models import Q
-from .models import TeacherProfile, User, Department, TeacherAssignment
+from .models import (
+    User, TeacherProfile, Department, TeacherAssignment,
+    StudentProfile, AdminProfile
+)
 from .serializers import (
+    UserCreateSerializer, UserUpdateSerializer, UserResponseSerializer, UserSummarySerializer,
     TeacherProfileCreateSerializer, TeacherProfileUpdateSerializer,
-    TeacherProfileDetailSerializer, TeacherProfileListItemSerializer
+    TeacherProfileDetailSerializer, TeacherProfileListItemSerializer,
+    StudentProfileSerializer, AdminProfileSerializer
 )
 from .permissions import IsAdminUser, IsTeacher
 
-
-from .models import User
-from .serializers import (
-    UserCreateSerializer,
-    UserUpdateSerializer,
-    UserResponseSerializer,
-    UserSummarySerializer
-)
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -151,14 +143,6 @@ class TeacherProfileViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Cannot delete teacher profile with active assignments"}, status=400)
         profile.delete()
         return Response({"success": True, "message": "Teacher profile deleted"}, status=200)
-
-
-# app/views.py
-
-from rest_framework import viewsets
-from .models import StudentProfile, AdminProfile
-from .serializers import StudentProfileSerializer, AdminProfileSerializer
-from rest_framework.permissions import IsAuthenticated
 
 
 class StudentProfileViewSet(viewsets.ModelViewSet):

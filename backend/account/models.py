@@ -2,6 +2,11 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from department.models import Department,Section
+from django.utils import timezone
+from decimal import Decimal
+
+
 
 
 class UserTypeEnum(models.TextChoices):
@@ -33,32 +38,6 @@ class TeacherProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
-# app/models.py
-
-import uuid
-from decimal import Decimal
-from django.db import models
-from django.utils import timezone
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
-
-
-class Section(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-
-class Department(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
 
 
 class StudentProfile(models.Model):

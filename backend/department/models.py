@@ -54,18 +54,3 @@ class Subject(models.Model):
     def __str__(self):
         return self.subject_name
 
-
-class SubjectTeacherSection(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    subject = models.ForeignKey(Subject, related_name='subject_teacher_sections', on_delete=models.CASCADE)
-    teacher = models.ForeignKey('TeacherProfile', related_name='subject_teacher_sections', on_delete=models.CASCADE)
-    section = models.ForeignKey(Section, related_name='subject_teacher_sections', on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    is_active = models.BooleanField(default=True)
-
-    class Meta:
-        unique_together = ('subject', 'teacher', 'section')
-
-    def __str__(self):
-        return f"{self.subject.subject_code} - {self.teacher.id} - {self.section.section_code}"

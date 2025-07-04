@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     "core",
     "department",
     "account",
+    
     "assessment",
+    
 ]
 
 MIDDLEWARE = [
@@ -52,6 +54,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+# backend/settings.py
+AUTH_USER_MODEL = 'account.User'
+
 
 ROOT_URLCONF = 'core.urls'
 

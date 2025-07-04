@@ -1,27 +1,8 @@
 # serializers.py
 from rest_framework import serializers
 from .models import Assignment, Quiz, Test, Submission
-from core.models import Subject, Section, TeacherProfile, StudentProfile
-
-class SubjectSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Subject
-        fields = ['id', 'name']
-
-class SectionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Section
-        fields = ['id', 'name']
-
-class TeacherProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TeacherProfile
-        fields = ['id', 'name']
-
-class StudentProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = StudentProfile
-        fields = ['id', 'name']
+from account.serializers import  StudentProfileSerializer, TeacherProfileSerializer
+from department.serializers import SubjectSerializer, SectionSerializer
 
 class AssignmentSerializer(serializers.ModelSerializer):
     subject = SubjectSerializer(read_only=True)

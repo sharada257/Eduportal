@@ -9,6 +9,7 @@ router = DefaultRouter()
 router.register(r'teachers', TeacherProfileViewSet, basename='teacher')
 router.register(r'student-profiles', StudentProfileViewSet, basename='student-profile')
 router.register(r'admin-profiles', AdminProfileViewSet, basename='admin-profile')
+router.register(r'users', UserViewSet, basename='user')
 
 
 urlpatterns = [

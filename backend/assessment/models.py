@@ -1,43 +1,11 @@
-# models.py
 import uuid
 from datetime import datetime
 from enum import Enum
 from django.db import models
 from django.utils import timezone
-from django.core.validators import MaxValueValidator, MinValueValidator
-
-
-class Subject(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-
-class Section(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-
-class TeacherProfile(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-
-class StudentProfile(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
+from django.core.exceptions import ValidationError
+from account.models import TeacherProfile, StudentProfile
+from department.models import Subject, Section
 
 class Assignment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -99,3 +67,20 @@ class Submission(models.Model):
         filled = [bool(self.assignment), bool(self.quiz), bool(self.test)]
         if filled.count(True) != 1:
             raise ValidationError("Only one of assignment, quiz or test must be set.")
+
+
+
+class SubjectTeacherSection(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    subject = models.ForeignKey(Subject, related_name='subject_teacher_sections', on_delete=models.CASCADE)
+    teacher = models.ForeignKey('account.TeacherProfile', related_name='subject_teacher_sections', on_delete=models.CASCADE)
+    section = models.ForeignKey(Section, related_name='subject_teacher_sections', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('subject', 'teacher', 'section')
+
+    def __str__(self):
+        return f"{self.subject.subject_code} - {self.teacher.id} - {self.section.section_code}"
