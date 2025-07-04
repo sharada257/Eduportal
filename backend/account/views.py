@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 
 from .models import (
-    User, TeacherProfile, Department, TeacherAssignment,
+    User, TeacherProfile,
     StudentProfile, AdminProfile
 )
 from .serializers import (
