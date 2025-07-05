@@ -89,11 +89,40 @@ export default function Profile() {
         <CardContent className="p-6 flex flex-col sm:flex-row gap-6 items-center">
           <Avatar className="w-20 h-20">
             <AvatarFallback className="text-3xl font-semibold">
-              <User className="2xl"/>
+              <User className="2xl" />
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 w-full">
-            <h3 className="text-2xl font-bold">{profile.user.first_name} {profile.user.last_name}</h3>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+              {isEditing ? (
+                <>
+                  <Input
+                    value={profile.user.first_name}
+                    onChange={(e) =>
+                      setProfile({
+                        ...profile,
+                        user: { ...profile.user, first_name: e.target.value },
+                      })
+                    }
+                    className="mb-2 sm:mb-0"
+                  />
+                  <Input
+                    value={profile.user.last_name}
+                    onChange={(e) =>
+                      setProfile({
+                        ...profile,
+                        user: { ...profile.user, last_name: e.target.value },
+                      })
+                    }
+                  />
+                </>
+              ) : (
+                <h3 className="text-2xl font-bold">
+                  {profile.user.first_name} {profile.user.last_name}
+                </h3>
+              )}
+            </div>
+
             <p className="text-gray-500">USN : {profile.registration_number}</p>
             <p className="text-gray-500">Section : {profile.section}</p>
             <div className="flex flex-wrap items-center gap-2">
@@ -106,10 +135,10 @@ export default function Profile() {
           <div className="text-right min-w-fit">
             <div className="flex flex-col items-center gap-2 text-gray-600">
               <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              <span className="text-sm">
-                Semester {profile.current_semester}
-              </span>
+                <Calendar className="w-4 h-4" />
+                <span className="text-sm">
+                  Semester {profile.current_semester}
+                </span>
               </div>
               <Badge variant="default">Program : {profile.program_type}</Badge>
               <Badge variant="secondary">Batch : {profile.admission_year} - {profile.batch_year}</Badge>
@@ -134,11 +163,8 @@ export default function Profile() {
                 id="admission_year"
                 type="number"
                 value={profile.admission_year}
-                onChange={(e) =>
-                  setProfile({ ...xprofile, admission_year: e.target.value })
-                }
-                disabled={!isEditing}
-                className={!isEditing ? "bg-gray-50" : ""}
+                disabled
+                className="bg-gray-50"
               />
             </div>
             <div>
@@ -147,11 +173,8 @@ export default function Profile() {
                 id="batch_year"
                 type="number"
                 value={profile.batch_year}
-                onChange={(e) =>
-                  setProfile({ ...profile, batch_year: e.target.value })
-                }
-                disabled={!isEditing}
-                className={!isEditing ? "bg-gray-50" : ""}
+                disabled
+                className="bg-gray-50"
               />
             </div>
             <div>
@@ -160,11 +183,8 @@ export default function Profile() {
                 id="current_semester"
                 type="number"
                 value={profile.current_semester}
-                onChange={(e) =>
-                  setProfile({ ...profile, current_semester: e.target.value })
-                }
-                disabled={!isEditing}
-                className={!isEditing ? "bg-gray-50" : ""}
+                disabled
+                className="bg-gray-50"
               />
             </div>
             <div>
@@ -172,16 +192,14 @@ export default function Profile() {
               <Input
                 id="program_type"
                 value={profile.program_type}
-                onChange={(e) =>
-                  setProfile({ ...profile, program_type: e.target.value })
-                }
-                disabled={!isEditing}
-                className={!isEditing ? "bg-gray-50" : ""}
+                disabled
+                className="bg-gray-50"
               />
             </div>
           </div>
         </CardContent>
       </Card>
+
 
       {/* Academic Performance */}
       <Card>
