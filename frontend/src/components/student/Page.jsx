@@ -7,15 +7,11 @@ import Assignments from "./Assignments"
 import Quizzes from "./Quizzes"
 import Tests from "./Tests"
 import Grades from "./Grades"
-// import {Notifications} from "./Notifications"
 import Notes from "./Notes"
 import Profile from "./Profile"
 
 function StudentPage() {
   const [currentPage, setCurrentPage] = useState("dashboard")
-  const [sidebarOpen, setSidebarOpen] = useState(true)
-
-
 
   const renderCurrentPage = () => {
     switch (currentPage) {
@@ -46,8 +42,6 @@ function StudentPage() {
         <Navigation
         currentPage={currentPage} 
         onPageChange={setCurrentPage}
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
         />
         <div className="flex-1 p-6 overflow-auto">
           <div className="max-w-7xl mx-auto">{renderCurrentPage()}</div>

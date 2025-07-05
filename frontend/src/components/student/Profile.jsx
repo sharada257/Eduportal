@@ -22,7 +22,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const studentId = "308176de-092b-4e4e-b953-12c37dcbf65b"; // <-- Replace with your dynamic ID if you have routing
+  const studentId = "ba2de7f2-0232-4318-a00d-13d93a3f9f93"; // <-- Replace with your dynamic ID if you have routing
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -88,8 +88,8 @@ export default function Profile() {
       <Card>
         <CardContent className="p-6 flex flex-col sm:flex-row gap-6 items-center">
           <Avatar className="w-20 h-20">
-            <AvatarFallback className="text-xl font-semibold">
-              {profile.user[0]}
+            <AvatarFallback className="text-3xl font-semibold">
+              <User className="2xl"/>
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 w-full">
@@ -124,7 +124,6 @@ export default function Profile() {
             <BookOpen className="w-5 h-5" />
             Academic Information
           </CardTitle>
-          <CardDescription>Your detailed academic records</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
