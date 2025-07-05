@@ -12,7 +12,7 @@ from .serializers import (
     UserCreateSerializer, UserUpdateSerializer, UserResponseSerializer, UserSummarySerializer,
     TeacherProfileCreateSerializer, TeacherProfileUpdateSerializer,
     TeacherProfileDetailSerializer, TeacherProfileListItemSerializer,
-    StudentProfileSerializer, AdminProfileSerializer
+   AdminProfileSerializer
 )
 from .permissions import IsAdminUser, IsTeacher
 
@@ -145,9 +145,69 @@ class TeacherProfileViewSet(viewsets.ModelViewSet):
         return Response({"success": True, "message": "Teacher profile deleted"}, status=200)
 
 
+from .models import StudentProfile
+from .serializers import (
+    StudentProfileListSerializer,
+    StudentProfileDetailSerializer,
+    StudentProfileCreateSerializer,
+    StudentProfileUpdateSerializer
+)
+
 class StudentProfileViewSet(viewsets.ModelViewSet):
-    queryset = StudentProfile.objects.select_related('user', 'section', 'created_by', 'updated_by')
-    serializer_class = StudentProfileSerializer
+    queryset = StudentProfile.objects.filter(is_active=True)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return StudentProfileListSerializer
+        elif self.action == 'retrieve':
+            return StudentProfileDetailSerializer
+        elif self.action == 'create':
+            return StudentProfileCreateSerializer
+        elif self.action in ['update', 'partial_update']:
+            return StudentProfileUpdateSerializer
+        return StudentProfileDetailSerializer
+
+    def list(self, request, *args, **kwargs):
+        try:
+            return super().list(request, *args, **kwargs)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+        except NotFound:
+            return Response({"error": "Student profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop('partial', False)
+            instance = self.get_object()
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            if serializer.is_valid():
+                self.perform_update(serializer)
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except NotFound:
+            return Response({"error": "Student profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.is_active = False  # Soft delete
+            instance.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except NotFound:
+            return Response({"error": "Student profile not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class AdminProfileViewSet(viewsets.ModelViewSet):

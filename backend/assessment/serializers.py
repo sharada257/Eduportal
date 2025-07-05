@@ -1,7 +1,7 @@
 # serializers.py
 from rest_framework import serializers
 from .models import Assignment, Quiz, Test, Submission,SubjectTeacherSection
-from account.serializers import  StudentProfileSerializer, TeacherProfileSerializer
+from account.serializers import   TeacherProfileSerializer
 from department.serializers import SubjectSerializer, SectionSerializer
 
 class AssignmentSerializer(serializers.ModelSerializer):
@@ -35,7 +35,6 @@ class SubmissionSerializer(serializers.ModelSerializer):
     assignment = AssignmentSerializer(read_only=True)
     quiz = QuizSerializer(read_only=True)
     test = TestSerializer(read_only=True)
-    student = StudentProfileSerializer(read_only=True)
 
     class Meta:
         model = Submission
