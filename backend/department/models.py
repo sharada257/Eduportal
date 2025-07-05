@@ -32,7 +32,7 @@ class Section(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.section_code
+        return self.section_name
 
 
 class Subject(models.Model):
