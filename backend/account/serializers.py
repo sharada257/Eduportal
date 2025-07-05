@@ -70,20 +70,31 @@ class userSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'first_name', 'last_name']
 
 class StudentProfileListSerializer(serializers.ModelSerializer):
+    semester_number = serializers.SerializerMethodField()
     user = userSerializer()
     section = serializers.StringRelatedField()
     class Meta:
         model = StudentProfile
-        fields = ['id', 'user', 'registration_number', 'admission_year', 'current_semester', 'academic_status']
+        fields = ['id', 'user', 'registration_number', 'admission_year', 'semester', 'academic_status', 'semester_number']
 
+    def get_semester_number(self, obj):
+        if obj.semester:
+            return obj.semester.semester_number
+        return None
 
 class StudentProfileDetailSerializer(serializers.ModelSerializer):
+    semester_number = serializers.SerializerMethodField()
     user = userSerializer()
     section = serializers.StringRelatedField()
     class Meta:
         model = StudentProfile
-        fields = ['id', 'user',"section",'registration_number', 'admission_year', 'current_semester', "batch_year","program_type","cgpa","sgpa_current","total_credits_completed","total_credits_required",'academic_status']
+        fields = ['id', 'user',"section",'registration_number', 'admission_year', 'semester', 'semester_number', "batch_year","program_type","cgpa","sgpa_current","total_credits_completed","total_credits_required",'academic_status']
 
+    def get_semester_number(self, obj):
+        if obj.semester:
+            return obj.semester.semester_number
+        return None
+    
 class StudentProfileCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentProfile
