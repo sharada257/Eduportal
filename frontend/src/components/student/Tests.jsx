@@ -35,13 +35,13 @@ const Tests = () => {
     }
   };
 
-  const testId = "308176de-092b-4e4e-b953-12c37dcbf65b"; // Replace with your dynamic ID if you have routing
+  const testId = "a81add9d-d44e-42e7-85f7-c813bc4a0949"; // Replace with your dynamic ID if you have routing
 
   useEffect(() => {
     const fetchtest = async () => {
       try {
-        const response = await api.get(ENDPOINT.tests);
-        setTest(response.data);
+        const response = await api.get(ENDPOINT.tests(testId));
+        setTest(response.data);``
       } catch (error) {
         console.error("Failed to fetch profile:", error);
       } finally {

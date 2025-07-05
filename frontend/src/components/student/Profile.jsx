@@ -41,7 +41,7 @@ export default function Profile() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await api.put(`/api/studentProfile/${studentId}/`, profile);
+      await api.put(ENDPOINT.studentProfile(studentId), profile);
       setIsEditing(false);
       // Optional: Show toast/notification of success
     } catch (error) {
@@ -102,8 +102,8 @@ export default function Profile() {
             <p className="text-gray-500">USN : {profile.registration_number}</p>
             <p className="text-gray-500">Section : {profile.section}</p>
             <div className="flex flex-wrap items-center gap-3 mt-3">
-              <Badge variant="default">Batch : {profile.program_type}</Badge>
-              <Badge variant="secondary">Batch: {profile.admission_year} - {profile.batch_year}</Badge>
+              <Badge variant="default">Program : {profile.program_type}</Badge>
+              <Badge variant="secondary">Batch : {profile.admission_year} - {profile.batch_year}</Badge>
             </div>
           </div>
           <div className="text-right min-w-fit">
@@ -134,7 +134,7 @@ export default function Profile() {
                 type="number"
                 value={profile.admission_year}
                 onChange={(e) =>
-                  setProfile({ ...profile, admission_year: e.target.value })
+                  setProfile({ ...xprofile, admission_year: e.target.value })
                 }
                 disabled={!isEditing}
                 className={!isEditing ? "bg-gray-50" : ""}

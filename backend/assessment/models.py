@@ -83,4 +83,4 @@ class SubjectTeacherSection(models.Model):
         unique_together = ('subject', 'teacher', 'section')
 
     def __str__(self):
-        return f"{self.subject.subject_code} - {self.teacher.id} - {self.section.section_code}"
+        return f"{self.subject.subject_code} - {self.teacher.id} - {self.section.section_name}"

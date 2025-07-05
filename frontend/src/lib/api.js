@@ -20,7 +20,7 @@ export const ENDPOINT = {
     quiz: (id) => `/quizzes/${id}/`,
 
     tests: "/tests/",
-    test: (id) => `/test/${id}/`,
+    tests: (id) => `/tests/${id}/`,
 
     submissions: "/submisssions/",
     submission: (id) => `/submissions/${id}/`,
