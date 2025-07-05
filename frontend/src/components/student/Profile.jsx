@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { User, Edit, Calendar, BookOpen } from "lucide-react";
+import { User, Edit, Calendar, BookOpen, Mail } from "lucide-react";
 import { api, ENDPOINT } from "@/lib/api"; // <-- adjust to your path
 
 export default function Profile() {
@@ -93,25 +93,26 @@ export default function Profile() {
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 w-full">
-            <h3 className="text-2xl font-bold">
-              {profile.user
-                .split("")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()}</h3>
+            <h3 className="text-2xl font-bold">{profile.user.first_name} {profile.user.last_name}</h3>
             <p className="text-gray-500">USN : {profile.registration_number}</p>
             <p className="text-gray-500">Section : {profile.section}</p>
-            <div className="flex flex-wrap items-center gap-3 mt-3">
-              <Badge variant="default">Program : {profile.program_type}</Badge>
-              <Badge variant="secondary">Batch : {profile.admission_year} - {profile.batch_year}</Badge>
+            <div className="flex flex-wrap items-center gap-2">
+              <Mail className="w-4 h-4" />
+              <span className="text-md text-gray-500">
+                {profile.user.email}
+              </span>
             </div>
           </div>
           <div className="text-right min-w-fit">
-            <div className="flex items-center gap-2 text-gray-600">
+            <div className="flex flex-col items-center gap-2 text-gray-600">
+              <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               <span className="text-sm">
                 Semester {profile.current_semester}
               </span>
+              </div>
+              <Badge variant="default">Program : {profile.program_type}</Badge>
+              <Badge variant="secondary">Batch : {profile.admission_year} - {profile.batch_year}</Badge>
             </div>
           </div>
         </CardContent>
