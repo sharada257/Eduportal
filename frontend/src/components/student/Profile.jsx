@@ -22,7 +22,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const studentId = "ba2de7f2-0232-4318-a00d-13d93a3f9f93"; // <-- Replace with your dynamic ID if you have routing
+  const studentId = "308176de-092b-4e4e-b953-12c37dcbf65b"; // <-- Replace with your dynamic ID if you have routing
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -93,36 +93,9 @@ export default function Profile() {
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 w-full">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
-              {isEditing ? (
-                <>
-                  <Input
-                    value={profile.user.first_name}
-                    onChange={(e) =>
-                      setProfile({
-                        ...profile,
-                        user: { ...profile.user, first_name: e.target.value },
-                      })
-                    }
-                    className="mb-2 sm:mb-0"
-                  />
-                  <Input
-                    value={profile.user.last_name}
-                    onChange={(e) =>
-                      setProfile({
-                        ...profile,
-                        user: { ...profile.user, last_name: e.target.value },
-                      })
-                    }
-                  />
-                </>
-              ) : (
-                <h3 className="text-2xl font-bold">
-                  {profile.user.first_name} {profile.user.last_name}
-                </h3>
-              )}
-            </div>
-
+            <h3 className="text-2xl font-bold">
+              {profile.user.first_name} {profile.user.last_name}
+            </h3>
             <p className="text-gray-500">USN : {profile.registration_number}</p>
             <p className="text-gray-500">Section : {profile.section}</p>
             <div className="flex flex-wrap items-center gap-2">
@@ -141,7 +114,9 @@ export default function Profile() {
                 </span>
               </div>
               <Badge variant="default">Program : {profile.program_type}</Badge>
-              <Badge variant="secondary">Batch : {profile.admission_year} - {profile.batch_year}</Badge>
+              <Badge variant="secondary">
+                Batch : {profile.admission_year} - {profile.batch_year}
+              </Badge>
             </div>
           </div>
         </CardContent>

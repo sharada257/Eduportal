@@ -17,12 +17,29 @@ class Department(models.Model):
         return self.department_name
 
 
+class Semester(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    semester_number = models.PositiveSmallIntegerField()
+    name= models.CharField(max_length=50, blank=True, null=True)  # e.g., "Semester 1", "Semester 2"
+    department = models.ForeignKey('Department', on_delete=models.CASCADE, related_name='semesters')
+    academic_year = models.CharField(max_length=20)  # e.g., 2024-25
+    start_date = models.DateField()
+    end_date = models.DateField()
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('semester_number', 'department', 'academic_year')
+
+    def __str__(self):
+        return f"Sem {self.semester_number} - {self.department.short_name} ({self.academic_year})"
+
+
 class Section(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     section_name = models.CharField(max_length=100)
     department = models.ForeignKey(Department, related_name='sections', on_delete=models.CASCADE)
-    current_semester = models.PositiveSmallIntegerField(default=1)
-    academic_year = models.CharField(max_length=20)
+    semester = models.ForeignKey(Semester, on_delete=models.PROTECT, related_name="sections",default=None, null=True, blank=True)
     batch_year = models.IntegerField()
     capacity = models.IntegerField(default=60)
     max_capacity = models.IntegerField(default=60)
@@ -43,10 +60,11 @@ class Subject(models.Model):
     description = models.TextField(blank=True, null=True)
     credits = models.IntegerField(default=0)
     department = models.ForeignKey(Department, related_name='subjects', on_delete=models.CASCADE)
-    semester = models.IntegerField()
+    semester = models.ForeignKey(Semester, on_delete=models.PROTECT, related_name="subjects",default=None, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
 
     def __str__(self):
         return self.subject_name

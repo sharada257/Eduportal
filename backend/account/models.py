@@ -1,7 +1,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from department.models import Department,Section
+from department.models import Department,Section,Semester
 from django.utils import timezone
 from decimal import Decimal
 
@@ -40,7 +40,7 @@ class StudentProfile(models.Model):
     section = models.ForeignKey(Section, on_delete=models.PROTECT, related_name="student_profiles")
     registration_number = models.CharField(max_length=50, unique=True, null=True, blank=True)
     admission_year = models.PositiveIntegerField()
-    current_semester = models.PositiveIntegerField(default=1)
+    semester = models.ForeignKey(Semester, on_delete=models.PROTECT, related_name="students_profiles",default=None, null=True, blank=True)
     batch_year = models.PositiveIntegerField()
     program_type = models.CharField(max_length=50, blank=True)
     cgpa = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal("0.00"))

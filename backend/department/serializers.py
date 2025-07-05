@@ -23,24 +23,22 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
 
 class SectionSerializer(serializers.ModelSerializer):
+    department_name= serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Section
         fields = [
             'id',
             'section_name',
             'department_name',
-            'current_semester',
-            'academic_year',
+            'semester',
         ]
 
-    def to_representation(self, instance):
-        try:
-            return super().to_representation(instance)
-        except Exception as e:
-            logger.exception(f"Error serializing Section {instance.id if instance else 'N/A'}: {e}")
-            raise serializers.ValidationError("Internal error serializing section data.")
+    def get_department_name(self, obj):
+        return obj.department.department_name
 
 
+   
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject

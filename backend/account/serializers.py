@@ -61,24 +61,22 @@ class TeacherProfileAPIResponseSerializer(serializers.Serializer):
     message = serializers.CharField()
     data = TeacherProfileDetailSerializer()
 
-
-# serializers/student_profile.py
-
-from rest_framework import serializers
 from .models import StudentProfile
-
-class StudentProfileListSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField(read_only=True)
-    section = serializers.StringRelatedField()
-    class Meta:
-        model = StudentProfile
-        fields = ['id', 'user', 'registration_number', 'admission_year', 'current_semester', 'academic_status']
 
 
 class userSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'first_name', 'last_name']
+
+class StudentProfileListSerializer(serializers.ModelSerializer):
+    user = userSerializer()
+    section = serializers.StringRelatedField()
+    class Meta:
+        model = StudentProfile
+        fields = ['id', 'user', 'registration_number', 'admission_year', 'current_semester', 'academic_status']
+
+
 class StudentProfileDetailSerializer(serializers.ModelSerializer):
     user = userSerializer()
     section = serializers.StringRelatedField()
@@ -90,9 +88,6 @@ class StudentProfileCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentProfile
         exclude = ['created_at', 'updated_at', 'updated_by']
-
-
-from rest_framework import serializers
 
 
 

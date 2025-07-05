@@ -37,7 +37,7 @@ class TeacherProfileAdmin(admin.ModelAdmin):
 
 @admin.register(StudentProfile)
 class StudentProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'registration_number', 'section', 'admission_year', 'current_semester', 'cgpa', 'is_active')
+    list_display = ('user', 'registration_number', 'section', 'admission_year', 'semester', 'cgpa', 'is_active')
     list_filter = ('academic_status', 'enrollment_status', 'is_active', 'section', 'admission_year')
     search_fields = ('registration_number', 'user__email', 'user__first_name', 'user__last_name')
     autocomplete_fields = ['user', 'section', 'created_by', 'updated_by']

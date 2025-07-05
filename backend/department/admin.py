@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Department, Section, Subject
+from .models import Department, Section, Subject,Semester
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
@@ -10,8 +10,8 @@ class DepartmentAdmin(admin.ModelAdmin):
 
 @admin.register(Section)
 class SectionAdmin(admin.ModelAdmin):
-    list_display = ( 'section_name', 'department', 'current_semester', 'academic_year', 'batch_year', 'capacity', 'is_active')
-    list_filter = ('academic_year', 'current_semester', 'is_active', 'department')
+    list_display = ( 'section_name', 'department', 'semester', 'batch_year', 'capacity', 'is_active')
+    list_filter = ( 'semester', 'is_active', 'department')
     search_fields = ( 'section_name',)
     autocomplete_fields = ['department']
     list_per_page = 25  # Pagination
@@ -23,3 +23,30 @@ class SubjectAdmin(admin.ModelAdmin):
     search_fields = ('subject_code', 'subject_name')
     autocomplete_fields = ['department']
     list_per_page = 25  # Pagination
+
+
+from django.contrib import admin
+from .models import Semester
+
+@admin.register(Semester)
+class SemesterAdmin(admin.ModelAdmin):
+    list_display = (
+        'semester_number', 
+        'name', 
+        'department', 
+        'academic_year', 
+        'start_date', 
+        'end_date', 
+        'is_active'
+    )
+    list_filter = (
+        'department', 
+        'academic_year', 
+        'is_active'
+    )
+    search_fields = (
+        'name', 
+        'academic_year', 
+        'department__name'
+    )
+    ordering = ('start_date',)
