@@ -1,28 +1,28 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from .models import User, TeacherProfile, StudentProfile, AdminProfile
 
 
 @admin.register(User)
-class UserAdmin(DefaultUserAdmin):
+class UserAdmin(admin.ModelAdmin):
     model = User
-    list_display = ('email', 'username', 'user_type', 'is_active', 'is_verified', 'created_at')
-    list_filter = ('is_active', 'is_verified', 'user_type', 'is_staff', 'is_superuser')
+    list_display = "__all__"
+    list_display = (
+        "username",
+        "email",
+        "first_name",
+        "last_name",
+        "user_type",
+        "is_active",
+        "is_staff",
+        "is_superuser",
+        "created_at",
+        "updated_at",
+    )
     search_fields = ('email', 'username', 'first_name', 'last_name')
     ordering = ('-created_at',)
     list_per_page = 25
 
-    fieldsets = DefaultUserAdmin.fieldsets + (
-        ('Custom Fields', {
-            'fields': ('user_type', 'is_verified'),
-        }),
-    )
-
-    add_fieldsets = DefaultUserAdmin.add_fieldsets + (
-        (None, {
-            'fields': ('user_type', 'is_verified'),
-        }),
-    )
+    
 
 
 @admin.register(TeacherProfile)
