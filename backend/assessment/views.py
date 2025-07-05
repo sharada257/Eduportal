@@ -20,7 +20,7 @@ class AssignmentViewSet(viewsets.ModelViewSet):
     ViewSet for Assignment CRUD operations with section-based filtering
     """
     serializer_class = AssignmentSerializer
-    permission_classes = [IsAuthenticated]
+    
     
     def get_queryset(self):
         queryset = Assignment.objects.filter(is_active=True)
@@ -160,7 +160,7 @@ class QuizViewSet(viewsets.ModelViewSet):
     ViewSet for Quiz CRUD operations with section-based filtering
     """
     serializer_class = QuizSerializer
-    permission_classes = [IsAuthenticated]
+    
     
     def get_queryset(self):
         queryset = Quiz.objects.filter(is_active=True)
@@ -359,7 +359,7 @@ class SubmissionViewSet(viewsets.ModelViewSet):
     ViewSet for Submission CRUD operations with proper validation
     """
     serializer_class = SubmissionSerializer
-    permission_classes = [IsAuthenticated]
+    
     
     def get_queryset(self):
         queryset = Submission.objects.select_related('student', 'assignment', 'quiz', 'test')
@@ -562,7 +562,7 @@ class SubjectTeacherSectionViewSet(viewsets.ModelViewSet):
     ViewSet for SubjectTeacherSection CRUD operations
     """
     serializer_class = SubjectTeacherSectionSerializer
-    permission_classes = [IsAuthenticated]
+    
     
     def get_queryset(self):
         queryset = SubjectTeacherSection.objects.filter(is_active=True)

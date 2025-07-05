@@ -11,66 +11,30 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
   User,
   Mail,
-  Phone,
   MapPin,
   Calendar,
   Save,
   Edit,
   Building,
 } from "lucide-react";
+import { api, ENDPOINT } from "@/lib/api";
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState();
   const [loading, setLoading] = useState(true);
 
-  // {
-  //   name: "Dr. Sarah Wilson",
-  //   email: "sarah.wilson@university.edu",
-  //   phone: "+1 (555) 123-4567",
-  //   department: "Mathematics Department",
-  //   office: "Room 204, Science Building",
-  //   bio: "Professor of Mathematics with 15 years of teaching experience. Specializing in Calculus, Linear Algebra, and Mathematical Analysis.",
-  //   joinDate: "September 2019",
-  //   employee_id: "EMP001234",
-  //   title: "Professor",
-  //   specialization: "Mathematics",
-  // }
-
-  //   {
-  //     "id": "4d309d03-3bb7-4bc5-8817-01237437c7ec",
-  //     "user": {
-  //         "id": "df6fa197-a858-420b-83ab-c4ba4dcb6e41",
-  //         "email": "a@gmail.com",
-  //         "is_active": true,
-  //         "is_verified": false,
-  //         "user_type": ""
-  //     },
-  //     "employee_id": null,
-  //     "designation": "ASSISTANT PROFESSOR",
-  //     "qualification": "BSC",
-  //     "experience_years": 0.0,
-  //     "department": {
-  //         "id": "93c8dd17-5ec6-463b-be35-70d42c7c36fa",
-  //         "department_name": "COMPUTER SCIENCE"
-  //     },
-  //     "office_location": "",
-  //     "created_at": "2025-07-05T08:32:02.649515Z",
-  //     "updated_at": "2025-07-05T08:32:02.649531Z"
-  // }
-
   const teacherId = "4d309d03-3bb7-4bc5-8817-01237437c7ec"; // Replace with your dynamic ID if you have routing
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await api.get(ENDPOINT.teacherProfile(teacherId));
+        const response = await api.get(ENDPOINT.teacher(teacherId));
         setProfile(response.data);
       } catch (error) {
         console.error("Failed to fetch profile:", error);
@@ -85,7 +49,7 @@ export default function Profile() {
     setSaving(true);
     try {
       console.log(profile);
-      await api.put(ENDPOINT.teacherProfile(teacherId), {
+      await api.put(ENDPOINT.teacher(teacherId), {
         user: {
           first_name: profile.user.first_name,
           last_name: profile.user.last_name,
@@ -146,9 +110,13 @@ export default function Profile() {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h3 className="text-2xl font-bold">{profile.user.first_name} {profile.user.last_name}</h3>
+              <h3 className="text-2xl font-bold">
+                {profile.user.first_name} {profile.user.last_name}
+              </h3>
               <p className="text-lg text-gray-600">{profile.designation}</p>
-              <p className="text-gray-500">{profile.department.department_name}</p>
+              <p className="text-gray-500">
+                {profile.department.department_name}
+              </p>
               <div className="flex items-center gap-3 mt-3">
                 <Badge variant="default">{profile.designation}</Badge>
                 <Badge variant="secondary">{profile.specialization}</Badge>
@@ -211,8 +179,6 @@ export default function Profile() {
                 />
               </div>
             </div>
-            
-            
           </CardContent>
         </Card>
 
@@ -285,30 +251,6 @@ export default function Profile() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Bio Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Professional Bio</CardTitle>
-          <CardDescription>
-            Tell others about your background and expertise
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div>
-            <Label htmlFor="bio">Biography</Label>
-            <Textarea
-              id="bio"
-              value={profile.bio}
-              onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-              disabled={!isEditing}
-              rows={6}
-              className={!isEditing ? "bg-gray-50" : ""}
-              placeholder="Write a brief description about your professional background, expertise, and teaching philosophy..."
-            />
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Teaching Statistics */}
       <Card>
