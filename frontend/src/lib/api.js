@@ -1,43 +1,43 @@
 import axios from "axios";
 
 export const ENDPOINT = {
-    departments: "/departments/",
-    department: (id) => `/departments/${id}/`,
+  departments: "/departments/",
+  department: (id) => `/departments/${id}/`,
 
-    sections: "/sections/",
-    section: (id) => `/sections/${id}/`,
+  sections: "/sections/",
+  section: (id) => `/sections/${id}/`,
 
-    subjects: "/subjects/",
-    subject: (id) => `/subjects/${id}/`,
+  subjects: "/subjects/",
+  subject: (id) => `/subjects/${id}/`,
 
-    subjectTeacherSections: "/subject-teacher-sections/",
-    subjectTeacherSection: (id) => `/subject-teacher-sections/${id}/`,
+  subjectTeacherSections: "/subject-teacher-sections/",
+  subjectTeacherSection: (id) => `/subject-teacher-sections/${id}/`,
 
-    assignments: "/assignments/",
-    assignment: (id) => `/assignments/${id}/`,
+  assignments: "/assignments/",
+  assignment: (id) => `/assignments/${id}/`,
 
-    quizzes: "/quizzes/",
-    quiz: (id) => `/quizzes/${id}/`,
+  quizzes: "/quizzes/",
+  quiz: (id) => `/quizzes/${id}/`,
 
-    tests: "/tests",
-    test: (id) => `/tests/${id}/`,
+  tests: "/tests",
+  test: (id) => `/tests/${id}/`,
 
-    submissions: "/submisssions/",
-    submission: (id) => `/submissions/${id}/`,
+  submissions: "/submisssions/",
+  submission: (id) => `/submissions/${id}/`,
 
-    teachers: "/teachers/",
-    teacher: (id) => `/teachers/${id}/`,
+  teachers: "/teacher-profiles/",
+  teacher: (id) => `/teacher-profiles/${id}/`,
 
-    studentProfiles: "/student-profiles/",
-    studentProfile: (id) => `/student-profiles/${id}/`,
+  studentProfiles: "/student-profiles/",
+  studentProfile: (id) => `/student-profiles/${id}/`,
 
-    adminProfiles: "/admin-profiles/",
-    adminProfile: (id) => `/admin-profiles/${id}/`,
+  adminProfiles: "/admin-profiles/",
+  adminProfile: (id) => `/admin-profiles/${id}/`,
 };
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const api = axios.create({
-    baseURL: API_BASE_URL,
-    withCredentials: true,
+  baseURL: API_BASE_URL,
+  withCredentials: true,
 });

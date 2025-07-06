@@ -34,6 +34,29 @@ ASSIGNMENTS:
 - GET    /api/assignments/by_section/?section_id={id}  - Get assignments by section
 - GET    /api/assignments/upcoming/?section_id={id}    - Get upcoming assignments
 
+[
+    {
+        "id": "a5f8f4f4-f342-4933-bc39-58a0c5b7f285",
+        "title": "Ass-1",
+        "subject": "cec7b83c-a5c8-4761-b0f1-84525fb5097d",
+        "subject_name": "DMML",
+        "subject_code": "22CSE47",
+        "teacher": "4d309d03-3bb7-4bc5-8817-01237437c7ec",
+        "teacher_name": "sharada kumari",
+        "section": "65e161fc-95fe-4d92-a579-0b4d9c33f941",
+        "section_name": "A",
+        "description": "",
+        "due_date": "2025-07-08T00:00:00Z",
+        "created_at": "2025-07-05T16:55:08Z",
+        "updated_at": "2025-07-05T16:55:25.886203Z",
+        "is_active": true,
+        "is_overdue": false,
+        "days_remaining": 2
+    }
+]
+
+
+
 QUIZZES:
 - GET    /api/quizzes/                         - List all quizzes
 - POST   /api/quizzes/                         - Create new quiz
@@ -42,6 +65,27 @@ QUIZZES:
 - PATCH  /api/quizzes/{id}/                    - Partial update quiz
 - DELETE /api/quizzes/{id}/                    - Delete quiz
 - GET    /api/quizzes/by_section/?section_id={id}      - Get quizzes by section
+
+
+[
+    {
+        "id": "086a802c-4dfb-4512-8f2d-e8bc7f799433",
+        "title": "quiz-1",
+        "subject": "cec7b83c-a5c8-4761-b0f1-84525fb5097d",
+        "subject_name": "DMML",
+        "subject_code": "22CSE47",
+        "teacher": "4d309d03-3bb7-4bc5-8817-01237437c7ec",
+        "teacher_name": "sharada kumari",
+        "section": "65e161fc-95fe-4d92-a579-0b4d9c33f941",
+        "section_name": "A",
+        "total_marks": 3,
+        "created_at": "2025-07-05T16:56:04Z",
+        "updated_at": "2025-07-05T16:56:17.799372Z",
+        "is_active": true
+    }
+]
+
+
 
 TESTS:
 - GET    /api/tests/                           - List all tests
@@ -53,6 +97,28 @@ TESTS:
 - GET    /api/tests/by_section/?section_id={id}        - Get tests by section
 - GET    /api/tests/upcoming/?section_id={id}          - Get upcoming tests
 
+
+{
+        "id": "21a23def-59a0-433c-9a0e-97ac80a439e5",
+        "title": "test-2",
+        "subject": "cec7b83c-a5c8-4761-b0f1-84525fb5097d",
+        "subject_name": "DMML",
+        "subject_code": "22CSE47",
+        "teacher": "4d309d03-3bb7-4bc5-8817-01237437c7ec",
+        "teacher_name": "sharada",
+        "section": "65e161fc-95fe-4d92-a579-0b4d9c33f941",
+        "section_name": "A",
+        "scheduled_date": "2025-07-05T18:00:00Z",
+        "total_marks": 5,
+        "created_at": "2025-07-05T14:06:17Z",
+        "updated_at": "2025-07-05T14:07:21.087450Z",
+        "is_active": true,
+        "is_upcoming": true,
+        "days_until_test": 0
+    },
+    
+]
+
 SUBMISSIONS:
 - GET    /api/submissions/                     - List all submissions
 - POST   /api/submissions/                     - Create new submission
@@ -63,6 +129,8 @@ SUBMISSIONS:
 - GET    /api/submissions/by_section/?section_id={id}  - Get submissions by section
 - GET    /api/submissions/pending_evaluation/?section_id={id} - Get pending evaluations
 - PATCH  /api/submissions/{id}/evaluate/      - Evaluate submission
+
+
 
 SUBJECT-TEACHER-SECTIONS:
 - GET    /api/subject-teacher-sections/        - List all assignments

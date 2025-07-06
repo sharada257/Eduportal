@@ -1,26 +1,39 @@
+import logging
+from django.utils import timezone
+from django.db import transaction, IntegrityError
+from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound
-from django.db.models import Q
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.exceptions import ValidationError, PermissionDenied, NotFound
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 from .models import (
-   TeacherProfile,
-    StudentProfile, AdminProfile
-)
-from .serializers import (
-    TeacherProfileCreateSerializer, TeacherProfileUpdateSerializer,
-    TeacherProfileDetailSerializer, 
-   AdminProfileSerializer
-)
-from .models import StudentProfile
-from .serializers import (
-    StudentProfileListSerializer,
-    StudentProfileDetailSerializer,
-    StudentProfileCreateSerializer,
-    StudentProfileUpdateSerializer
+    UserTypeEnum,
+    TeacherProfile,
+    StudentProfile,
+    AdminProfile
 )
 
+from .serializers import (
+    TeacherProfileCreateSerializer,
+    TeacherProfileUpdateSerializer,
+    TeacherProfileDetailSerializer,
+    TeacherProfileListSerializer,
+    
+    StudentProfileCreateSerializer,
+    StudentProfileUpdateSerializer,
+    StudentProfileDetailSerializer,
+    StudentProfileListSerializer,
+
+    AdminProfileSerializer,
+    UserBasicSerializer
+)
+
+logger = logging.getLogger(__name__)
 
 
 class StudentProfileViewSet(viewsets.ModelViewSet):
@@ -78,29 +91,6 @@ class StudentProfileViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except NotFound:
             return Response({"error": "Student profile not found"}, status=status.HTTP_404_NOT_FOUND)
-
-
-class AdminProfileViewSet(viewsets.ModelViewSet):
-    queryset = AdminProfile.objects.select_related('user', 'department', 'created_by', 'updated_by')
-    serializer_class = AdminProfileSerializer
-
-
-# views.py
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter, OrderingFilter
-
-from .models import TeacherProfile
-from .serializers import (
-    TeacherProfileListSerializer,
-    TeacherProfileDetailSerializer,
-    TeacherProfileCreateSerializer,
-    TeacherProfileUpdateSerializer
-)
 
 
 class TeacherProfileViewSet(viewsets.ModelViewSet):
@@ -203,3 +193,130 @@ class TeacherProfileViewSet(viewsets.ModelViewSet):
         serializer = TeacherProfileListSerializer(verified_teachers, many=True)
         return Response(serializer.data)
 
+
+class BaseViewSet(viewsets.ModelViewSet):
+    """Base ViewSet with common error handling"""
+    
+    def handle_exception(self, exc):
+        """Custom exception handler"""
+        if isinstance(exc, ValidationError):
+            return Response(
+                {'error': 'Validation failed', 'details': exc.detail},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        elif isinstance(exc, IntegrityError):
+            return Response(
+                {'error': 'Database integrity error', 'message': str(exc)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        elif isinstance(exc, ObjectDoesNotExist):
+            return Response(
+                {'error': 'Resource not found', 'message': str(exc)},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        elif isinstance(exc, PermissionDenied):
+            return Response(
+                {'error': 'Permission denied', 'message': str(exc)},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        logger.error(f"Unexpected error in {self.__class__.__name__}: {exc}")
+        return super().handle_exception(exc)
+
+class AdminProfileViewSet(BaseViewSet):
+    """
+    ViewSet for AdminProfile model
+    """
+    queryset = AdminProfile.objects.all()
+    serializer_class = AdminProfileSerializer
+    
+    
+    
+    def create(self, request, *args, **kwargs):
+        """Create admin profile (Super Admin only)"""
+        try:
+            if request.user.user_type != UserTypeEnum.ADMIN:
+                raise PermissionDenied("Only admins can create admin profiles")
+            
+            with transaction.atomic():
+                serializer = self.get_serializer(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                
+                # Validate user is an admin
+                user = serializer.validated_data['user']
+                if user.user_type != UserTypeEnum.ADMIN:
+                    return Response(
+                        {'error': 'User must be of type Admin'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                
+                # Check if admin profile already exists
+                if AdminProfile.objects.filter(user=user).exists():
+                    return Response(
+                        {'error': 'Admin profile already exists for this user'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                
+                # Set created_by
+                serializer.validated_data['created_by'] = request.user
+                
+                admin_profile = serializer.save()
+                logger.info(f"Admin profile created: {admin_profile.user.email}")
+                
+                return Response(
+                    AdminProfileSerializer(admin_profile).data,
+                    status=status.HTTP_201_CREATED
+                )
+        except Exception as e:
+            return self.handle_exception(e)
+    
+    def update(self, request, *args, **kwargs):
+        """Update admin profile with permission checks"""
+        try:
+            instance = self.get_object()
+            
+            # Check permissions
+            if not self.can_modify_admin_profile(request.user, instance):
+                raise PermissionDenied("You don't have permission to update this admin profile")
+            
+            partial = kwargs.pop('partial', False)
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            
+            with transaction.atomic():
+                # Set updated_by
+                serializer.validated_data['updated_by'] = request.user
+                admin_profile = serializer.save()
+                logger.info(f"Admin profile updated: {admin_profile.user.email}")
+                
+            return Response(AdminProfileSerializer(admin_profile).data)
+        except Exception as e:
+            return self.handle_exception(e)
+    
+    def destroy(self, request, *args, **kwargs):
+        """Soft delete admin profile"""
+        try:
+            instance = self.get_object()
+            
+            # Prevent deletion of the last admin
+            if AdminProfile.objects.filter(is_active=True).count() <= 1:
+                return Response(
+                    {'error': 'Cannot delete the last active admin profile'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            with transaction.atomic():
+                instance.is_active = False
+                instance.updated_by = request.user
+                instance.save()
+                logger.info(f"Admin profile deactivated: {instance.user.email}")
+                
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return self.handle_exception(e)
+    
+    def can_modify_admin_profile(self, current_user, admin_profile):
+        """Check if current user can modify admin profile"""
+        if current_user.user_type == UserTypeEnum.ADMIN:
+            return True
+        return False

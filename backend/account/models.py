@@ -28,8 +28,8 @@ class TeacherProfile(models.Model):
     qualification = models.CharField(max_length=100)
     experience_years = models.FloatField(default=0)
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True)
-    office_location = models.CharField(max_length=100, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    joined_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):

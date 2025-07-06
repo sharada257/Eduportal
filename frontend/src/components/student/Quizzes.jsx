@@ -1,38 +1,14 @@
-import React from "react";
-import { Clock, Users, Award, Play, CheckCircle, Lock } from "lucide-react";
-import { quizzes } from "../../data/mockData";
-import { api, ENDPOINT } from "@/lib/api"; // Adjust the import path as necessary
-import { useEffect, useState } from "react";
+"use client";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Clock, Users, Award, Lock } from "lucide-react";
+import { api, ENDPOINT } from "@/lib/api";
+import Link from "next/link";
 
 const Quizzes = () => {
   const [loading, setLoading] = useState(true);
   const [quizzes, setQuizzes] = useState([]);
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "available":
-        return "bg-green-100 text-green-800";
-      case "completed":
-        return "bg-blue-100 text-blue-800";
-      case "locked":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "available":
-        return <Play className="w-4 h-4" />;
-      case "completed":
-        return <CheckCircle className="w-4 h-4" />;
-      case "locked":
-        return <Lock className="w-4 h-4" />;
-      default:
-        return <Clock className="w-4 h-4" />;
-    }
-  };
+  const router = useRouter();
 
   useEffect(() => {
     const fetchQuizzes = async () => {
@@ -47,6 +23,7 @@ const Quizzes = () => {
     };
     fetchQuizzes();
   }, []);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-96">
@@ -57,7 +34,6 @@ const Quizzes = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <h2 className="text-3xl font-bold text-gray-900">Quizzes</h2>
         <p className="text-gray-600 mt-2">
@@ -69,104 +45,89 @@ const Quizzes = () => {
         {quizzes.map((quiz) => (
           <div
             key={quiz.id}
-            className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+            onClick={() => router.push(`/quizzes/${quiz.id}`)}
+            className="cursor-pointer bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
           >
-            {/* Header */}
-            <div className={`${quiz.subject.color} p-4`}>
+            <div className="bg-blue-50 p-4">
               <div className="flex items-center justify-between">
-                <div className="text-gray-800">
-                  <h3 className="font-semibold text-lg">{quiz.title}</h3>
-                  <p className="text-gray-800/90 text-sm">
-                    {quiz.subject.name}
+                <div>
+                  <h3 className="font-semibold text-lg text-gray-900">
+                    {quiz.title}
+                  </h3>
+                  <p className="text-gray-700 text-sm">
+                    {quiz.subject_name} ({quiz.subject_code})
                   </p>
                 </div>
                 <div
-                  className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${getStatusColor(
-                    quiz.status
-                  )}`}
+                  className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${quiz.is_active
+                    ? "bg-green-100 text-green-800"
+                    : "bg-gray-100 text-gray-800"
+                    }`}
                 >
-                  {getStatusIcon(quiz.status)}
+                  {quiz.is_active ? (
+                    <>
+                      <Clock className="w-4 h-4" />
+                      Active
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-4 h-4" />
+                      Locked
+                    </>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Content */}
-            <div className="p-6">
-              <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
-                  <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg mx-auto mb-2">
-                    <Users className="w-6 h-6 text-blue-600" />
+                  <div className="flex items-center justify-center w-12 h-12 bg-yellow-100 rounded-lg mx-auto mb-2">
+                    <Users className="w-6 h-6 text-yellow-600" />
                   </div>
-                  <div className="text-sm text-gray-500">Questions</div>
+                  <div className="text-sm text-gray-500">Section</div>
                   <div className="font-semibold text-gray-900">
-                    {quiz.questions}
+                    {quiz.section_name}
                   </div>
                 </div>
 
                 <div className="text-center">
                   <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-lg mx-auto mb-2">
-                    <Clock className="w-6 h-6 text-green-600" />
+                    <Award className="w-6 h-6 text-green-600" />
                   </div>
-                  <div className="text-sm text-gray-500">Duration</div>
+                  <div className="text-sm text-gray-500">Total Marks</div>
                   <div className="font-semibold text-gray-900">
-                    {quiz.duration} min
+                    {quiz.total_marks}
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Attempts</span>
+              <div className="space-y-3 text-sm text-gray-600">
+                <div className="flex justify-between">
+                  <span>Teacher</span>
+                  <span className="font-medium text-gray-800">{quiz.teacher_name}</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Created At</span>
                   <span className="font-medium">
-                    {quiz.attempts}/{quiz.maxAttempts}
+                    {new Date(quiz.created_at).toLocaleDateString()}
                   </span>
                 </div>
-
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Due Date</span>
-                  <span className="font-medium"></span>
-                </div>
-
-                {quiz.bestScore && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Best Score</span>
-                    <div className="flex items-center gap-2">
-                      <Award className="w-4 h-4 text-yellow-500" />
-                      <span className="font-medium text-yellow-600"></span>
-                    </div>
-                  </div>
-                )}
               </div>
 
-              {/* Action Button */}
-              <div className="mt-6">
-                {quiz.status === "available" && (
-                  <button className="w-full bg-blue-600 text-gray-800 py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                    Start Quiz
-                  </button>
-                )}
+              <div className="mt-4">
+                {quiz.is_active ? (
 
-                {quiz.status === "completed" &&
-                  quiz.attempts < quiz.maxAttempts && (
-                    <button className="w-full bg-green-600 text-gray-800 py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium">
-                      Retake Quiz
+                  <Link href={`/quizzes/${quiz.id}`} key={quiz.id}>
+                    <button className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                      Start Quiz
                     </button>
-                  )}
-
-                {quiz.status === "completed" &&
-                  quiz.attempts >= quiz.maxAttempts && (
-                    <button
-                      disabled
-                      className="w-full bg-gray-300 text-gray-500 py-3 px-4 rounded-lg cursor-not-allowed font-medium"
-                    >
-                      No More Attempts
-                    </button>
-                  )}
-
-                {quiz.status === "locked" && (
+                  </Link>
+                ) : (
                   <button
                     disabled
-                    className="w-full bg-gray-300 text-gray-500 py-3 px-4 rounded-lg cursor-not-allowed font-medium"
+                    className="w-full bg-gray-300 text-gray-500 py-3 rounded-lg cursor-not-allowed font-medium"
                   >
                     Quiz Locked
                   </button>

@@ -1,18 +1,17 @@
-"use client"
-import React, { use, useState } from 'react';
-import { Calendar, Clock, CheckCircle, AlertCircle, FileText } from 'lucide-react';
-import { useEffect} from 'react';
-import { api, ENDPOINT } from '@/lib/api'; // Adjust the import path as necessary
-  
+"use client";
+import React, { useState, useEffect } from "react";
+import { Calendar, Clock, CheckCircle, AlertCircle, FileText } from "lucide-react";
+import { api, ENDPOINT } from "@/lib/api";
+import Link from "next/link";
+
 const Assignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filter, setFilter] = useState('all');
 
   useEffect(() => {
     const fetchAssignments = async () => {
-      try {   
+      try {
         const response = await api.get(ENDPOINT.assignments);
         setAssignments(response.data);
       } catch (error) {
@@ -24,6 +23,7 @@ const Assignments = () => {
     };
     fetchAssignments();
   }, []);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-96">
@@ -31,146 +31,91 @@ const Assignments = () => {
       </div>
     );
   }
+
   if (error) {
-    return (      
+    return (
       <div className="flex justify-center items-center h-96">
         <p className="text-red-500">{error}</p>
       </div>
     );
   }
-  
-  const filteredAssignments = assignments.filter(assignment => {
-    if (filter === 'all') return true;
-    return assignment.status === filter;
-  });
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'submitted': return 'bg-blue-100 text-blue-800';
-      case 'graded': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'pending': return <AlertCircle className="w-4 h-4" />;
-      case 'submitted': return <Clock className="w-4 h-4" />;
-      case 'graded': return <CheckCircle className="w-4 h-4" />;
-      default: return <FileText className="w-4 h-4" />;
-    }
-  };
-
-
-  const getDaysUntilDue = (dueDate) => {
-    const today = new Date();
-    const due = new Date(dueDate);
-    const diffTime = due.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
-
-  const DueCountdown = (dueDate ) => {
-    const [daysLeft, setDaysLeft] = useState(null);
-
-      useEffect(() => {
-        const days = getDaysUntilDue(dueDate);
-        setDaysLeft(days);
-      }, [dueDate]);
-      return daysLeft;
-  };
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <h2 className="text-3xl font-bold text-gray-900">Assignments</h2>
-        <p className="text-gray-600 mt-2">Test your knowledge with interactive quizzes</p>
+        <p className="text-gray-600 mt-2">Check your upcoming assignments and deadlines</p>
       </div>
-
-      {/* Filter Tabs */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4">
-        <div className="flex border-b border-gray-200">
-          {[
-            { key: 'all', label: 'All Assignments' },
-            { key: 'pending', label: 'Pending' },
-            { key: 'submitted', label: 'Submitted' },
-            { key: 'graded', label: 'Graded' }
-          ].map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setFilter(tab.key)}
-              className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-                filter === tab.key
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Assignments List */}
       <div className="space-y-4">
-        {filteredAssignments.map((assignment) => {
-          const daysUntilDue = DueCountdown(assignment.dueDate);
-          
-          return (
-            <div key={assignment.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between">
+        {assignments.map((assignment) => (
+          <Link href={`/assignments/${assignment.id}`} key={assignment.id}>
+            <div
+              key={assignment.id}
+              className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow"
+            >
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className={`w-2 h-2 rounded-full ${assignment.subject.color}`}></div>
-                    <span className="text-sm font-medium text-gray-500">{assignment.subject.code}</span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${getStatusColor(assignment.status)}`}>
-                      {getStatusIcon(assignment.status)}
-                      {assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}
-                    </span>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                    {assignment.title}
+                  </h3>
+
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-2">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      <span>{assignment.subject_name} ({assignment.subject_code})</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4" />
+                      <span>Section: {assignment.section_name}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      <span>Teacher: {assignment.teacher_name}</span>
+                    </div>
                   </div>
-                  
-                  <h3 className="text-l font-semibold text-gray-800 mb-2">{assignment.title}</h3>
-                  
-                  
+
+                  <p className="text-gray-600 text-sm mb-3">{assignment.description}</p>
+
                   <div className="flex items-center gap-6 text-sm text-gray-500">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
-                      <span>Due: {assignment.dueDate.toLocaleDateString()}</span>
+                      <span>Due: {new Date(assignment.due_date).toLocaleDateString()}</span>
                     </div>
-                    
+
+                    <div className="flex items-center gap-2">
+                      {assignment.is_overdue ? (
+                        <>
+                          <AlertCircle className="w-4 h-4 text-red-600" />
+                          <span className="text-red-600">Overdue</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="w-4 h-4 text-green-600" />
+                          <span className="text-green-600">On Time</span>
+                        </>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      <span>{assignment.days_remaining} days remaining</span>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="text-right">
-                  <div className="text-sm text-gray-600">Max Grade</div>
-                  <div className="text-xl font-bold text-gray-800">{assignment.maxGrade}</div>
-                  
-                  {assignment.grade !== undefined && (
-                    <div className="mt-2">
-                      <div className="text-sm text-gray-500">Your Grade</div>
-                      <div className={`text-xl font-bold ${
-                        (assignment.grade / assignment.maxGrade) >= 0.9 ? 'text-green-600' :
-                        (assignment.grade / assignment.maxGrade) >= 0.8 ? 'text-blue-600' :
-                        (assignment.grade / assignment.maxGrade) >= 0.7 ? 'text-yellow-600' :
-                        'text-red-500'
-                      }`}>
-                        {assignment.grade}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {assignment.status === 'pending' && (
-                    <button className="mt-4 px-4 py-2 bg-black-500 text-white rounded-lg hover:bg-black transition-colors">
+
+                {assignment.is_active && (
+                  <div className="text-right">
+                    <button className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors">
                       Submit Assignment
                     </button>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
-          );
-        })}
+          </Link>
+        ))}
       </div>
     </div>
   );
