@@ -22,7 +22,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const studentId = "308176de-092b-4e4e-b953-12c37dcbf65b"; // <-- Replace with your dynamic ID if you have routing
+  const studentId = "3f117de0-db97-4eb7-a22c-eff68d9a855e"; // <-- Replace with your dynamic ID if you have routing
 
   useEffect(() => {
     const fetchProfile = async () => {

@@ -178,27 +178,27 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
-    def validate(self, data):
-        email = data.get("email")
-        password = data.get("password")
+    # def validate(self, data):
+    #     email = data.get("email")
+    #     password = data.get("password")
 
-        # Check if a user with this email exists
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            raise serializers.ValidationError("Invalid email or password.")
+    #     # Check if a user with this email exists
+    #     try:
+    #         user = User.objects.get(email=email)
+    #     except User.DoesNotExist:
+    #         raise serializers.ValidationError("Invalid email or password.")
 
-        # Check password
-        if not user.check_password(password):
-            raise serializers.ValidationError("Invalid email or password.")
+    #     # Check password
+    #     if not user.check_password(password):
+    #         raise serializers.ValidationError("Invalid email or password.")
 
-        # Optional: check if user is active
-        if not user.is_active:
-            raise serializers.ValidationError("This account is inactive.")
+    #     # Optional: check if user is active
+    #     if not user.is_active:
+    #         raise serializers.ValidationError("This account is inactive.")
 
         
-        # Add the user to validated data
-        data["user"] = user
-        return data
+    #     # Add the user to validated data
+    #     data["user"] = user
+    #     return data
 
 

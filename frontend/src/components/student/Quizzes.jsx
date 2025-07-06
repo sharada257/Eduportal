@@ -1,28 +1,19 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Clock, Users, Award, Lock } from "lucide-react";
-import { api, ENDPOINT } from "@/lib/api";
 import Link from "next/link";
+import useQuizStore from "@/stores/useQuizzesStore";
 
 const Quizzes = () => {
-  const [loading, setLoading] = useState(true);
-  const [quizzes, setQuizzes] = useState([]);
   const router = useRouter();
+  const { quizzes, loading, error, getAllQuizzes } = useQuizStore();
 
   useEffect(() => {
-    const fetchQuizzes = async () => {
-      try {
-        const response = await api.get(ENDPOINT.quizzes);
-        setQuizzes(response.data);
-      } catch (error) {
-        console.error("Failed to fetch quizzes:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchQuizzes();
-  }, []);
+    if (quizzes.length === 0) {
+      getAllQuizzes();
+    }
+  }, [getAllQuizzes, quizzes.length]);
 
   if (loading) {
     return (
@@ -32,13 +23,27 @@ const Quizzes = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <p className="text-red-500">{error.message || "Failed to load quizzes."}</p>
+      </div>
+    );
+  }
+
+  if (quizzes.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <p className="text-gray-500">No quizzes found.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-3xl font-bold text-gray-900">Quizzes</h2>
-        <p className="text-gray-600 mt-2">
-          Test your knowledge with interactive quizzes
-        </p>
+        <p className="text-gray-600 mt-2">Test your knowledge with interactive quizzes</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -51,18 +56,17 @@ const Quizzes = () => {
             <div className="bg-blue-50 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold text-lg text-gray-900">
-                    {quiz.title}
-                  </h3>
+                  <h3 className="font-semibold text-lg text-gray-900">{quiz.title}</h3>
                   <p className="text-gray-700 text-sm">
                     {quiz.subject_name} ({quiz.subject_code})
                   </p>
                 </div>
                 <div
-                  className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${quiz.is_active
-                    ? "bg-green-100 text-green-800"
-                    : "bg-gray-100 text-gray-800"
-                    }`}
+                  className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${
+                    quiz.is_active
+                      ? "bg-green-100 text-green-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
                 >
                   {quiz.is_active ? (
                     <>
@@ -86,9 +90,7 @@ const Quizzes = () => {
                     <Users className="w-6 h-6 text-yellow-600" />
                   </div>
                   <div className="text-sm text-gray-500">Section</div>
-                  <div className="font-semibold text-gray-900">
-                    {quiz.section_name}
-                  </div>
+                  <div className="font-semibold text-gray-900">{quiz.section_name}</div>
                 </div>
 
                 <div className="text-center">
@@ -96,9 +98,7 @@ const Quizzes = () => {
                     <Award className="w-6 h-6 text-green-600" />
                   </div>
                   <div className="text-sm text-gray-500">Total Marks</div>
-                  <div className="font-semibold text-gray-900">
-                    {quiz.total_marks}
-                  </div>
+                  <div className="font-semibold text-gray-900">{quiz.total_marks}</div>
                 </div>
               </div>
 
@@ -118,7 +118,6 @@ const Quizzes = () => {
 
               <div className="mt-4">
                 {quiz.is_active ? (
-
                   <Link href={`/quizzes/${quiz.id}`} key={quiz.id}>
                     <button className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
                       Start Quiz

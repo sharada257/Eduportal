@@ -1,6 +1,8 @@
 import axios from "axios";
 
 export const ENDPOINT = {
+  login : "/login/",
+  
   departments: "/departments/",
   department: (id) => `/departments/${id}/`,
 

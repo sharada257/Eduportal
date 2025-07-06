@@ -33,17 +33,17 @@ export const patchSubjectTeacherSection = (id, data) => api.patch(ENDPOINT.subje
 export const deleteSubjectTeacherSection = (id, data) => api.put(ENDPOINT.subjectTeacherSection(id), data); // DELETE /api/subject-teacher-sections/:id/
 
 
-export const fetchAssignments = () => api.get(ENDPOINT.assignments()); // GET /api/assignments/
+export const fetchAssignments = () => api.get(ENDPOINT.assignments); // GET /api/assignments/
 export const fetchAssignment = (assignmentId) => api.get(ENDPOINT.assignment(assignmentId)); // GET /api/assignments/:id/
-export const createAssignment = (data) => api.post(ENDPOINT.assignments(), data); // POST /api/assignments/
+export const createAssignment = (data) => api.post(ENDPOINT.assignments, data); // POST /api/assignments/
 export const updateAssignment = (assignmentId, data) => api.put(ENDPOINT.assignment(assignmentId), data); // PUT /api/assignments/:id/
 export const patchAssignment = (assignmentId, data) => api.patch(ENDPOINT.assignment(assignmentId), data); // PATCH /api/assignments/:id/
 export const deleteAssignment = (assignmentId, data) => api.put(ENDPOINT.assignment(assignmentId), data); // DELETE /api/assignments/:id/
 
 
-export const fetchQuizzes = () => api.get(ENDPOINT.quizzes()); // GET /api/quizzes/
+export const fetchQuizzes = () => api.get(ENDPOINT.quizzes); // GET /api/quizzes/
 export const fetchQuiz = (quizId) => api.get(ENDPOINT.quiz(quizId)); // GET /api/quizzes/:id/                       
-export const createQuiz = (data) => api.post(ENDPOINT.quizzes(), data); // POST /api/quizzes/
+export const createQuiz = (data) => api.post(ENDPOINT.quizzes, data); // POST /api/quizzes/
 export const updateQuiz = (quizId, data) => api.put(ENDPOINT.quiz(quizId), data); // PUT /api/quizzes/:id/
 export const patchQuiz = (quizId, data) => api.patch(ENDPOINT.quiz(quizId), data); // PATCH /api/quizzes/:id/
 export const deleteQuiz = (quizId, data) => api.put(ENDPOINT.quiz(quizId), data); // DELETE /api/quizzes/:id/

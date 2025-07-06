@@ -1,28 +1,17 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Calendar, Clock, CheckCircle, AlertCircle, FileText } from "lucide-react";
-import { api, ENDPOINT } from "@/lib/api";
 import Link from "next/link";
+import useAssignmentStore from "@/stores/useAssignmentStore";
 
 const Assignments = () => {
-  const [assignments, setAssignments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { assignments, loading, error, getAllAssignments } = useAssignmentStore();
 
   useEffect(() => {
-    const fetchAssignments = async () => {
-      try {
-        const response = await api.get(ENDPOINT.assignments);
-        setAssignments(response.data);
-      } catch (error) {
-        console.error("Failed to fetch assignments:", error);
-        setError("Failed to load assignments. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAssignments();
-  }, []);
+    if (assignments.length === 0) {
+      getAllAssignments();
+    }
+  }, [getAllAssignments, assignments.length]);
 
   if (loading) {
     return (
@@ -35,7 +24,17 @@ const Assignments = () => {
   if (error) {
     return (
       <div className="flex justify-center items-center h-96">
-        <p className="text-red-500">{error}</p>
+        <p className="text-red-500">
+          {typeof error === "string" ? error : "Failed to load assignments. Please try again later."}
+        </p>
+      </div>
+    );
+  }
+
+  if (assignments.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <p className="text-gray-500">No assignments found.</p>
       </div>
     );
   }
@@ -46,11 +45,11 @@ const Assignments = () => {
         <h2 className="text-3xl font-bold text-gray-900">Assignments</h2>
         <p className="text-gray-600 mt-2">Check your upcoming assignments and deadlines</p>
       </div>
+
       <div className="space-y-4">
         {assignments.map((assignment) => (
           <Link href={`/assignments/${assignment.id}`} key={assignment.id}>
             <div
-              key={assignment.id}
               className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow"
             >
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -62,7 +61,9 @@ const Assignments = () => {
                   <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-2">
                     <div className="flex items-center gap-2">
                       <FileText className="w-4 h-4" />
-                      <span>{assignment.subject_name} ({assignment.subject_code})</span>
+                      <span>
+                        {assignment.subject_name} ({assignment.subject_code})
+                      </span>
                     </div>
 
                     <div className="flex items-center gap-2">
