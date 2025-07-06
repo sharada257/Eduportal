@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Sidebar from "./sidebar"
-import Dashboard from "./dashboard"
-import CourseManagement from "./course-management"
-import QuizBuilder from "./quiz-builder"
-import AssignmentGrading from "./assignment-grading"
-import Students from "./students"
-import GradeBook from "./grade-book"
-import Profile from "./profile"
-import Settings from "./settings"
+import { useState } from "react";
+import Sidebar from "./sidebar";
+import Dashboard from "./dashboard";
+import CourseManagement from "./course-management";
+import QuizBuilder from "./quiz-builder";
+import AssignmentGrading from "./assignment-grading";
+import Students from "./students";
+import GradeBook from "./grade-book";
+import Profile from "./profile";
+import Settings from "./settings";
 
 export default function TeacherDashboard() {
-  const [activeSection, setActiveSection] = useState("dashboard")
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [activeSection, setActiveSection] = useState("dashboard");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [courses, setCourses] = useState([
     {
@@ -28,7 +28,7 @@ export default function TeacherDashboard() {
           title: "Chapter 1: Introduction",
           content: "Basic concepts and definitions in mathematics",
           date: "2024-01-15",
-          type: "lecture" ,
+          type: "lecture",
         },
       ],
     },
@@ -44,7 +44,7 @@ export default function TeacherDashboard() {
           title: "Newton's Laws",
           content: "Three fundamental laws of motion",
           date: "2024-01-16",
-          type: "lecture" ,
+          type: "lecture",
         },
       ],
     },
@@ -56,14 +56,38 @@ export default function TeacherDashboard() {
       description: "Laboratory Chemistry",
       notes: [],
     },
-  ])
+  ]);
 
   const [students, setStudents] = useState([
-    { id: 1, name: "John Smith", email: "john@email.com", course: "MATH101", grade: "A" },
-    { id: 2, name: "Sarah Johnson", email: "sarah@email.com", course: "MATH101", grade: "B+" },
-    { id: 3, name: "Mike Davis", email: "mike@email.com", course: "PHY201", grade: "A-" },
-    { id: 4, name: "Emily Brown", email: "emily@email.com", course: "CHEM150", grade: "B" },
-  ])
+    {
+      id: 1,
+      name: "John Smith",
+      email: "john@email.com",
+      course: "MATH101",
+      grade: "A",
+    },
+    {
+      id: 2,
+      name: "Sarah Johnson",
+      email: "sarah@email.com",
+      course: "MATH101",
+      grade: "B+",
+    },
+    {
+      id: 3,
+      name: "Mike Davis",
+      email: "mike@email.com",
+      course: "PHY201",
+      grade: "A-",
+    },
+    {
+      id: 4,
+      name: "Emily Brown",
+      email: "emily@email.com",
+      course: "CHEM150",
+      grade: "B",
+    },
+  ]);
 
   const [assignments, setAssignments] = useState([
     {
@@ -107,50 +131,74 @@ export default function TeacherDashboard() {
         },
       ],
     },
-  ])
+  ]);
 
   const renderContent = () => {
     switch (activeSection) {
       case "dashboard":
-        return <Dashboard courses={courses} students={students} assignments={assignments} />
+        return (
+          <Dashboard
+            courses={courses}
+            students={students}
+            assignments={assignments}
+          />
+        );
       case "courses":
-        return <CourseManagement courses={courses} setCourses={setCourses} />
+        return <CourseManagement courses={courses} setCourses={setCourses} />;
       case "students":
-        return <Students students={students} courses={courses} />
+        return <Students students={students} courses={courses} />;
       case "quiz-builder":
-        return <QuizBuilder courses={courses} />
+        return <QuizBuilder courses={courses} />;
       case "assignments":
-        return <AssignmentGrading assignments={assignments} setAssignments={setAssignments} courses={courses} />
+        return (
+          <AssignmentGrading
+            assignments={assignments}
+            setAssignments={setAssignments}
+            courses={courses}
+          />
+        );
       case "grades":
-        return <GradeBook courses={courses} students={students} />
+        return <GradeBook courses={courses} students={students} />;
       case "profile":
-        return <Profile />
+        return <Profile />;
       case "settings":
-        return <Settings />
+        return <Settings />;
       default:
-        return <Dashboard courses={courses} students={students} assignments={assignments} />
+        return (
+          <Dashboard
+            courses={courses}
+            students={students}
+            assignments={assignments}
+          />
+        );
     }
-  }
+  };
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <Sidebar
-        activeSection={activeSection}
-        setActiveSection={setActiveSection}
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-      />
-      <div className="flex-1 p-6 overflow-auto">
-        <div className="max-w-7xl mx-auto">{renderContent()}</div>
+    return (
+      <div className="min-h-screen bg-gray-50 flex">
+        {/* Sidebar */}
+        <div
+          className={`fixed top-0 left-0 z-50 h-full bg-white shadow-lg transition-all duration-300 ${
+            isSidebarOpen ? "w-64" : "w-16"
+          }`}
+          onMouseEnter={() => setIsSidebarOpen(true)}
+          onMouseLeave={() => setIsSidebarOpen(false)}
+        >
+          <Sidebar
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
+          />
+        </div>
+  
+        {/* Content */}
+        <div
+          className={`transition-all duration-300 flex-1 h-screen overflow-auto p-6 ${
+            isSidebarOpen ? "ml-64" : "ml-16"
+          }`}
+        >
+          <div className="max-w-7xl mx-auto">{renderContent()}</div>
+        </div>
       </div>
-    </div>
-  )
-}
-
-// <Navigation
-// currentPage={currentPage} 
-// onPageChange={setCurrentPage}
-// />
-// <div className="flex-1 p-6 overflow-auto">
-//   <div className="max-w-7xl mx-auto">{renderCurrentPage()}</div>
-// </div>
+    );
+  }
+  

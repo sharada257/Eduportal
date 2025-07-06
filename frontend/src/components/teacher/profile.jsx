@@ -28,6 +28,7 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState();
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   const teacherId = "4d309d03-3bb7-4bc5-8817-01237437c7ec"; // Replace with your dynamic ID if you have routing
 
@@ -80,6 +81,7 @@ export default function Profile() {
       </div>
     );
   }
+  console.log(profile);
 
   return (
     <div className="space-y-6">
@@ -113,7 +115,6 @@ export default function Profile() {
               <h3 className="text-2xl font-bold">
                 {profile.user.first_name} {profile.user.last_name}
               </h3>
-              <p className="text-lg text-gray-600">{profile.designation}</p>
               <p className="text-gray-500">
                 {profile.department.department_name}
               </p>
@@ -128,11 +129,9 @@ export default function Profile() {
             <div className="text-right">
               <div className="flex items-center gap-2 text-gray-600 mb-2">
                 <Calendar className="w-4 h-4" />
-                <span className="text-sm">Joined {profile.joinDate}</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600">
-                <MapPin className="w-4 h-4" />
-                <span className="text-sm">{profile.office}</span>
+                <span className="text-sm">
+                  Joined {profile.joined_at.split("T")[0]}
+                </span>
               </div>
             </div>
           </div>
@@ -155,7 +154,11 @@ export default function Profile() {
               <Label htmlFor="name">Full Name</Label>
               <Input
                 id="name"
-                value={profile.name}
+                value={
+                  profile.user.first_name && profile.user.last_name
+                    ? `${profile.user.first_name} ${profile.user.last_name}`
+                    : ""
+                }
                 onChange={(e) =>
                   setProfile({ ...profile, name: e.target.value })
                 }
@@ -170,11 +173,8 @@ export default function Profile() {
                 <Input
                   id="email"
                   type="email"
-                  value={profile.email}
-                  onChange={(e) =>
-                    setProfile({ ...profile, email: e.target.value })
-                  }
-                  disabled={!isEditing}
+                  value={profile.user.email}
+                  disabled
                   className={`pl-10 ${!isEditing ? "bg-gray-50" : ""}`}
                 />
               </div>
@@ -199,10 +199,7 @@ export default function Profile() {
               <Input
                 id="title"
                 value={profile.designation}
-                onChange={(e) =>
-                  setProfile({ ...profile, title: e.target.value })
-                }
-                disabled={!isEditing}
+                disabled
                 className={!isEditing ? "bg-gray-50" : ""}
               />
             </div>
@@ -211,10 +208,7 @@ export default function Profile() {
               <Input
                 id="department"
                 value={profile.department.department_name}
-                onChange={(e) =>
-                  setProfile({ ...profile, department: e.target.value })
-                }
-                disabled={!isEditing}
+                disabled
                 className={!isEditing ? "bg-gray-50" : ""}
               />
             </div>
@@ -222,11 +216,8 @@ export default function Profile() {
               <Label htmlFor="specialization">Specialization</Label>
               <Input
                 id="specialization"
-                value={profile.specialization}
-                onChange={(e) =>
-                  setProfile({ ...profile, specialization: e.target.value })
-                }
-                disabled={!isEditing}
+                value={profile.qualification}
+                disabled
                 className={!isEditing ? "bg-gray-50" : ""}
               />
             </div>
@@ -243,7 +234,7 @@ export default function Profile() {
               <Label htmlFor="joinDate">Join Date</Label>
               <Input
                 id="joinDate"
-                value={profile.joinDate}
+                value={profile.joined_at ? profile.joined_at.split("T")[0] : ""}
                 disabled
                 className="bg-gray-50"
               />
@@ -285,9 +276,13 @@ export default function Profile() {
         <Card>
           <CardContent className="p-4">
             <div className="flex gap-2">
-              <Button onClick={handleSave} className="flex items-center gap-2">
+              <Button
+                onClick={handleSave}
+                className="flex items-center gap-2 "
+                disabled={saving}
+              >
                 <Save className="w-4 h-4" />
-                Save Changes
+                {saving ? "Saving..." : "Save Changes"}
               </Button>
               <Button variant="outline" onClick={() => setIsEditing(false)}>
                 Cancel

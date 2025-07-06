@@ -1,69 +1,50 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Plus, Edit, Eye, FileText, Users, BookOpen, Save, X, Upload } from "lucide-react"
+import { useEffect, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input.jsx";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Plus,
+  Edit,
+  Eye,
+  FileText,
+  Users,
+  BookOpen,
+  Save,
+  X,
+  Upload,
+} from "lucide-react";
+import useTeacherCourseStore from "@/stores/teacherCourseStore";
 
+export default function CourseManagement() {
+  const courses = useTeacherCourseStore((state) => state.courses);
+  const getCoursesByTeacher = useTeacherCourseStore(
+    (state) => state.getCoursesByTeacher
+  );
 
-export default function CourseManagement({ courses, setCourses }) {
-  const [selectedCourse, setSelectedCourse] = useState(null)
-  const [showAddNote, setShowAddNote] = useState(false)
-  const [newNote, setNewNote] = useState({
-    title: "",
-    content: "",
-    type: "lecture" ,
-  })
-
-  const addNoteToCourse = (courseId) => {
-    if (!newNote.title || !newNote.content) return
-
-    const updatedCourses = courses.map((course) => {
-      if (course.id === courseId) {
-        const note = {
-          id: Date.now(),
-          title: newNote.title,
-          content: newNote.content,
-          type: newNote.type,
-          date: new Date().toISOString().split("T")[0],
-        }
-        return {
-          ...course,
-          notes: [...(course.notes || []), note],
-        }
-      }
-      return course
-    })
-
-    setCourses(updatedCourses)
-    setNewNote({ title: "", content: "", type: "lecture" })
-    setShowAddNote(false)
-  }
-
-  const deleteNote = (courseId, noteId) => {
-    const updatedCourses = courses.map((course) => {
-      if (course.id === courseId) {
-        return {
-          ...course,
-          notes: course.notes?.filter((note) => note.id !== noteId) || [],
-        }
-      }
-      return course
-    })
-    setCourses(updatedCourses)
-  }
+  useEffect(() => {
+    getCoursesByTeacher(teacherId);
+  }, [teacherId]);
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-semibold">Course Management</h2>
-          <p className="text-gray-600">Manage your courses and add teaching materials</p>
+          <p className="text-gray-600">
+            Manage your courses and add teaching materials
+          </p>
         </div>
         {!selectedCourse && (
           <Button className="flex items-center gap-2">
@@ -76,11 +57,16 @@ export default function CourseManagement({ courses, setCourses }) {
       {!selectedCourse ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map((course) => (
-            <Card key={course.id} className="hover:shadow-lg transition-all cursor-pointer group">
+            <Card
+              key={course.id}
+              className="hover:shadow-lg transition-all cursor-pointer group"
+            >
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  <span className="group-hover:text-blue-600 transition-colors">{course.name}</span>
-                  <Badge variant="secondary">{course.code}</Badge>
+                  <span className="group-hover:text-blue-600 transition-colors">
+                    {course.subject_name}
+                  </span>
+                  <Badge variant="secondary">{course.subject_code}</Badge>
                 </CardTitle>
                 <CardDescription>{course.description}</CardDescription>
               </CardHeader>
@@ -97,7 +83,12 @@ export default function CourseManagement({ courses, setCourses }) {
                     </span>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="flex-1" onClick={() => setSelectedCourse(course)}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setSelectedCourse(course)}
+                    >
                       <BookOpen className="w-4 h-4 mr-1" />
                       Manage
                     </Button>
@@ -124,7 +115,9 @@ export default function CourseManagement({ courses, setCourses }) {
                 <p className="text-gray-600">{selectedCourse.code}</p>
               </div>
             </div>
-            <Badge variant="outline">{selectedCourse.students} Students Enrolled</Badge>
+            <Badge variant="outline">
+              {selectedCourse.students} Students Enrolled
+            </Badge>
           </div>
 
           <Tabs defaultValue="notes" className="space-y-6">
@@ -134,8 +127,13 @@ export default function CourseManagement({ courses, setCourses }) {
 
             <TabsContent value="notes" className="space-y-6">
               <div className="flex justify-between items-center">
-                <h4 className="text-lg font-medium">Course Notes & Materials</h4>
-                <Button onClick={() => setShowAddNote(true)} className="flex items-center gap-2">
+                <h4 className="text-lg font-medium">
+                  Course Notes & Materials
+                </h4>
+                <Button
+                  onClick={() => setShowAddNote(true)}
+                  className="flex items-center gap-2"
+                >
                   <Plus className="w-4 h-4" />
                   Add Note
                 </Button>
@@ -146,7 +144,11 @@ export default function CourseManagement({ courses, setCourses }) {
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                       Add New Note
-                      <Button variant="ghost" size="sm" onClick={() => setShowAddNote(false)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowAddNote(false)}
+                      >
                         <X className="w-4 h-4" />
                       </Button>
                     </CardTitle>
@@ -159,7 +161,9 @@ export default function CourseManagement({ courses, setCourses }) {
                           id="note-title"
                           placeholder="e.g., Chapter 1: Introduction"
                           value={newNote.title}
-                          onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
+                          onChange={(e) =>
+                            setNewNote({ ...newNote, title: e.target.value })
+                          }
                         />
                       </div>
                       <div>
@@ -185,23 +189,33 @@ export default function CourseManagement({ courses, setCourses }) {
                         placeholder="Enter your note content here..."
                         rows={6}
                         value={newNote.content}
-                        onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
+                        onChange={(e) =>
+                          setNewNote({ ...newNote, content: e.target.value })
+                        }
                       />
                     </div>
                     <div>
                       <Label>Attach PDF (Optional)</Label>
                       <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
                         <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                        <p className="text-sm text-gray-600">Drag and drop PDF files here, or click to browse</p>
+                        <p className="text-sm text-gray-600">
+                          Drag and drop PDF files here, or click to browse
+                        </p>
                         <Input type="file" accept=".pdf" className="hidden" />
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button onClick={() => addNoteToCourse(selectedCourse.id)} className="flex items-center gap-2">
+                      <Button
+                        onClick={() => addNoteToCourse(selectedCourse.id)}
+                        className="flex items-center gap-2"
+                      >
                         <Save className="w-4 h-4" />
                         Save Note
                       </Button>
-                      <Button variant="outline" onClick={() => setShowAddNote(false)}>
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowAddNote(false)}
+                      >
                         Cancel
                       </Button>
                     </div>
@@ -211,14 +225,21 @@ export default function CourseManagement({ courses, setCourses }) {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {selectedCourse.notes?.map((note) => (
-                  <Card key={note.id} className="hover:shadow-md transition-shadow">
+                  <Card
+                    key={note.id}
+                    className="hover:shadow-md transition-shadow"
+                  >
                     <CardHeader>
                       <CardTitle className="flex items-center justify-between">
                         <span className="text-lg">{note.title}</span>
                         <div className="flex items-center gap-2">
                           <Badge
                             variant={
-                              note.type === "lecture" ? "default" : note.type === "assignment" ? "secondary" : "outline"
+                              note.type === "lecture"
+                                ? "default"
+                                : note.type === "assignment"
+                                ? "secondary"
+                                : "outline"
                             }
                           >
                             {note.type}
@@ -228,7 +249,9 @@ export default function CourseManagement({ courses, setCourses }) {
                       <CardDescription>Created on {note.date}</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-gray-700 mb-4 line-clamp-3">{note.content}</p>
+                      <p className="text-sm text-gray-700 mb-4 line-clamp-3">
+                        {note.content}
+                      </p>
                       <div className="flex gap-2">
                         <Button size="sm" variant="outline">
                           <Edit className="w-4 h-4 mr-1" />
@@ -261,5 +284,5 @@ export default function CourseManagement({ courses, setCourses }) {
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -1,7 +1,8 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import TeacherProfileViewSet
-from .views import StudentProfileViewSet, AdminProfileViewSet
+from .views import StudentProfileViewSet, AdminProfileViewSet,LoginView,LogoutView
+
 
 
 router = DefaultRouter()
@@ -12,7 +13,10 @@ router.register(r'admin-profiles', AdminProfileViewSet, basename='admin-profile'
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('login/', LoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
 ]
+
 
 """
 http://127.0.0.1:8000/api/admin-profiles/a04441a6-fd36-408e-90a9-1d4a7fdd0c97/
@@ -27,6 +31,20 @@ http://127.0.0.1:8000/api/admin-profiles/a04441a6-fd36-408e-90a9-1d4a7fdd0c97/
     "updated_at": "2025-07-05T17:18:21.873745Z",
     "is_active": true
 }
+
+login
+{
+  "access": "eyJ0eXAiOiJKV1QiLCJhbGciOi...",
+  "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOi...",
+  "user_type": "teacher",
+  "user_id": "7f08...",
+  "profile": {
+    "name": "John Doe",
+    "employee_id": "EMP123",
+    "department": "CSE"
+  }
+}
+
 
 """
 

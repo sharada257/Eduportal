@@ -13,6 +13,12 @@ from .serializers import (
 )
 from account.models import TeacherProfile, StudentProfile
 from department.models import Section
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from account.models import StudentProfile
+from account.serializers import StudentProfileListSerializer  # make sure this is correctly imported
+
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):
@@ -658,12 +664,12 @@ class SubjectTeacherSectionViewSet(viewsets.ModelViewSet):
             )
         
         try:
-            assignments = SubjectTeacherSection.objects.filter(
-                teacher_id=teacher_id,
+            subjects = SubjectTeacherSection.objects.filter(
+                teacher__id=teacher_id,
                 is_active=True
-            ).select_related('subject', 'teacher', 'section').order_by('section__section_name')
+            ).select_related('subject', 'teacher', 'section')
             
-            serializer = SubjectTeacherSectionSerializer(assignments, many=True)
+            serializer = SubjectTeacherSectionSerializer(subjects, many=True)
             return Response(serializer.data)
             
         except Exception as e:
@@ -671,3 +677,32 @@ class SubjectTeacherSectionViewSet(viewsets.ModelViewSet):
                 {'error': 'Failed to retrieve assignments'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
+    @action(detail=False, methods=['get'])
+    def by_teacher_student(self, request):
+        """Get all students assigned to the sections taught by a given teacher"""
+        teacher_id = request.query_params.get('teacher_id')
+        if not teacher_id:
+            return Response(
+                {'error': 'teacher_id parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Step 1: Get the section IDs where this teacher teaches
+        sections = SubjectTeacherSection.objects.filter(
+            teacher__id=teacher_id,
+            is_active=True
+        ).values_list('section_id', flat=True).distinct()
+
+        if not sections:
+            return Response({'message': 'No sections found for this teacher.'}, status=status.HTTP_200_OK)
+
+        # Step 2: Get all active students in those sections
+        students = StudentProfile.objects.filter(
+            section_id__in=sections,
+            is_active=True
+        ).select_related('user', 'section')
+
+        # Step 3: Serialize the students
+        serializer = StudentProfileListSerializer(students, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

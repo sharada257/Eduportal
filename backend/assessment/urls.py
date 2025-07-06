@@ -147,4 +147,48 @@ Query Parameters:
 - subject_id: Filter by subject ID
 - teacher_id: Filter by teacher ID
 - type: Filter submissions by type (assignment/quiz/test)
+
+
+to get the courses taught by a teacher 
+http://127.0.0.1:8000/api/subject-teacher-sections/by_teacher/?teacher_id=4d309d03-3bb7-4bc5-8817-01237437c7ec
+
+
+[
+    {
+        "id": "e3f74a45-82fc-4cf5-9d65-d6c50a196ded",
+        "subject": "cec7b83c-a5c8-4761-b0f1-84525fb5097d",
+        "subject_name": "DMML",
+        "subject_code": "22CSE47",
+        "teacher": "4d309d03-3bb7-4bc5-8817-01237437c7ec",
+        "teacher_name": "sharada kumari",
+        "teacher_email": "a@gmail.com",
+        "section": "65e161fc-95fe-4d92-a579-0b4d9c33f941",
+        "section_name": "A",
+        "department_name": "COMPUTER SCIENCE",
+        "created_at": "2025-07-06T08:28:19.509447Z",
+        "updated_at": "2025-07-06T08:28:19.509465Z",
+        "is_active": true
+    }
+]
+
+to get students taught by a teacher
+http://127.0.0.1:8000/api/subject-teacher-sections/by_teacher_student/?teacher_id=4d309d03-3bb7-4bc5-8817-01237437c7ec
+
+
+[
+    {
+        "id": "5e178d81-7433-4e7a-9602-c338049d1cb6",
+        "first_name": "sharada",
+        "last_name": "kumari",
+        "email": "a@gmail.com",
+        "section": "A",
+        "registration_number": "134135",
+        "admission_year": 2,
+        "semester": null,
+        "academic_status": "active",
+        "semester_number": null
+    }
+]
+
+
 """

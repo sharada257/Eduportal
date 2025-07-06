@@ -5,9 +5,6 @@ from .models import TeacherProfile, User
 from department.models import Department
 
 
-
-
-
 class userSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -15,11 +12,13 @@ class userSerializer(serializers.ModelSerializer):
 
 class StudentProfileListSerializer(serializers.ModelSerializer):
     semester_number = serializers.SerializerMethodField()
-    user = userSerializer()
-    section = serializers.StringRelatedField()
+    first_name = serializers.CharField(source='user.first_name', read_only=True)
+    last_name = serializers.CharField(source='user.last_name', read_only=True)
+    email = serializers.CharField(source='user.email', read_only=True)
+    section = serializers.CharField(source='section.section_name', read_only=True)
     class Meta:
         model = StudentProfile
-        fields = ['id', 'user', 'registration_number', 'admission_year', 'semester', 'academic_status', 'semester_number']
+        fields = ['id', "first_name","last_name","email","section", 'registration_number', 'admission_year', 'semester', 'academic_status', 'semester_number']
 
     def get_semester_number(self, obj):
         if obj.semester:
@@ -85,7 +84,7 @@ class UserBasicSerializer(serializers.ModelSerializer):
     """Basic user info for teacher profile"""
     class Meta:
         model = User
-        fields = ['id', 'email', 'is_active', 'is_verified', 'user_type']
+        fields = ['id',"first_name","last_name",'email']
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -105,7 +104,7 @@ class TeacherProfileListSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'user', 'employee_id', 'designation', 
             'qualification', 'experience_years', 'department',
-            'office_location', 'created_at', 'updated_at'
+             'created_at', 'updated_at'
         ]
 
 
@@ -119,7 +118,7 @@ class TeacherProfileDetailSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'user', 'employee_id', 'designation', 
             'qualification', 'experience_years', 'department',
-            'office_location', 'created_at', 'updated_at'
+             'created_at', 'updated_at', 'joined_at', 
         ]
 
 
@@ -132,7 +131,7 @@ class TeacherProfileCreateSerializer(serializers.ModelSerializer):
         fields = [
             'user_id', 'employee_id', 'designation', 
             'qualification', 'experience_years', 'department',
-            'office_location'
+            
         ]
     
     def validate_user_id(self, value):
@@ -158,8 +157,7 @@ class TeacherProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherProfile
         fields = [
-            'employee_id', 'designation', 'qualification', 
-            'experience_years', 'department', 'office_location'
+            "user"
         ]
     
     def validate_employee_id(self, value):
@@ -169,4 +167,38 @@ class TeacherProfileUpdateSerializer(serializers.ModelSerializer):
         ).exclude(id=self.instance.id).exists():
             raise serializers.ValidationError("Employee ID already exists")
         return value
+
+from rest_framework import serializers
+
+from django.contrib.auth import authenticate
+from rest_framework import serializers
+from .models import User  # adjust to your User model import
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        email = data.get("email")
+        password = data.get("password")
+
+        # Check if a user with this email exists
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("Invalid email or password.")
+
+        # Check password
+        if not user.check_password(password):
+            raise serializers.ValidationError("Invalid email or password.")
+
+        # Optional: check if user is active
+        if not user.is_active:
+            raise serializers.ValidationError("This account is inactive.")
+
+        
+        # Add the user to validated data
+        data["user"] = user
+        return data
+
 

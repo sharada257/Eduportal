@@ -185,7 +185,7 @@ export default function AdminDashboardMain() {
         )
       case "courses":
         return (
-          <CourseManagement courses={courses} setCourses={setCourses} departments={departments} teachers={teachers} />
+          <CourseManagement />
         )
       case "assignments":
         return <AssignmentManagement assignments={[]} teachers={teachers} courses={courses} departments={departments} />

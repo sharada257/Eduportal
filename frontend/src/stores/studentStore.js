@@ -2,7 +2,7 @@
 
 import create from 'zustand';
 import { devtools } from 'zustand/middleware';
-import * as studentApi from '@/lib/api/studentApi';
+import * as studentApi from '@/lib/api/';
 
 const useStudentStore = create(devtools((set, get) => ({
   students: [],

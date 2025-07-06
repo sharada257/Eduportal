@@ -1,8 +1,6 @@
-// src/store/teacherStore.js
-
-import create from "zustand";
+import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import * as teacherApi from "@/lib/api/studentApi"; // or wherever your functions are
+import * as teacherApi from "@/lib/api/studentApi"; // adjust path as needed
 
 const useTeacherStore = create(
   devtools((set, get) => ({
@@ -11,12 +9,15 @@ const useTeacherStore = create(
     error: null,
 
     fetchTeachers: async () => {
-      set({ loading: true });
+      set({ loading: true, error: null });
       try {
         const res = await teacherApi.fetchTeacherProfiles();
         set({ teachers: res.data, loading: false });
       } catch (err) {
-        set({ error: err.message, loading: false });
+        set({
+          error: err?.response?.data?.detail || err.message || "Fetch failed",
+          loading: false,
+        });
       }
     },
 
@@ -27,7 +28,9 @@ const useTeacherStore = create(
           teachers: [res.data, ...state.teachers],
         }));
       } catch (err) {
-        set({ error: err.message });
+        set({
+          error: err?.response?.data?.detail || err.message || "Add failed",
+        });
       }
     },
 
@@ -35,10 +38,14 @@ const useTeacherStore = create(
       try {
         const res = await teacherApi.updateTeacherProfile(id, data);
         set((state) => ({
-          teachers: state.teachers.map((t) => (t.id === id ? res.data : t)),
+          teachers: state.teachers.map((t) =>
+            t.id === id ? res.data : t
+          ),
         }));
       } catch (err) {
-        set({ error: err.message });
+        set({
+          error: err?.response?.data?.detail || err.message || "Update failed",
+        });
       }
     },
 
@@ -49,7 +56,9 @@ const useTeacherStore = create(
           teachers: state.teachers.filter((t) => t.id !== id),
         }));
       } catch (err) {
-        set({ error: err.message });
+        set({
+          error: err?.response?.data?.detail || err.message || "Delete failed",
+        });
       }
     },
   }))

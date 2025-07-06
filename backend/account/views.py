@@ -320,3 +320,102 @@ class AdminProfileViewSet(BaseViewSet):
         if current_user.user_type == UserTypeEnum.ADMIN:
             return True
         return False
+    
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
+from .models import User, TeacherProfile, StudentProfile, AdminProfile
+from .serializers import LoginSerializer  # import it
+
+class LoginView(APIView):
+    permission_classes = []
+
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data['email']
+        password = serializer.validated_data['password']
+
+        user = authenticate(request, email=email, password=password)
+        if not user:
+            return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if not user.is_active:
+            return Response({"detail": "Account is inactive"}, status=status.HTTP_403_FORBIDDEN)
+
+        refresh = RefreshToken.for_user(user)
+
+        # Get profile based on user_type
+        profile_data = None
+        try:
+            if user.user_type == "teacher":
+                profile = TeacherProfile.objects.select_related("user", "department").get(user=user)
+                profile_data = {
+                    "name": user.get_full_name(),
+                    "employee_id": profile.employee_id,
+                    "department": profile.department.department_name if profile.department else None,
+                }
+
+            elif user.user_type == "student":
+                profile = StudentProfile.objects.select_related("user", "section", "semester").get(user=user)
+                profile_data = {
+                    "name": user.get_full_name(),
+                    "registration_number": profile.registration_number,
+                    "semester": profile.semester.semester_number if profile.semester else None,
+                    "section": profile.section.name,
+                }
+
+            elif user.user_type == "admin":
+                profile = AdminProfile.objects.select_related("user", "department").get(user=user)
+                profile_data = {
+                    "name": user.get_full_name(),
+                    "department": profile.department.department_name if profile.department else None,
+                }
+        except Exception:
+            profile_data = None
+
+        return Response({
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+            "user_type": user.user_type,
+            "user_id": str(user.id),
+            "profile": profile_data,
+        })
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from rest_framework.permissions import IsAuthenticated
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        refresh_token = request.data.get("refresh")
+
+        if not refresh_token:
+            return Response(
+                {"detail": "Refresh token is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+            return Response(
+                {"detail": "Successfully logged out."},
+                status=status.HTTP_205_RESET_CONTENT
+            )
+
+        except TokenError as e:
+            return Response(
+                {"detail": "Invalid or expired refresh token."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
