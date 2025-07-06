@@ -365,11 +365,12 @@ class LoginView(APIView):
         except Exception as e:
             logger.exception("Error creating JWT token")
             return Response({"detail": "Token generation failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+        
+        print(user.user_type)
         # Get profile based on user_type
         profile_data = None
         try:
-            if user.user_type == "teacher":
+            if user.user_type == "Teacher":
                 profile = TeacherProfile.objects.select_related("user", "department").get(user=user)
                 profile_data = {
                     "teacher_id": str(profile.id),
@@ -384,7 +385,7 @@ class LoginView(APIView):
                     "experience_years": profile.experience_years,
                 }
 
-            elif user.user_type == "student":
+            elif user.user_type == "Student":
                 profile = StudentProfile.objects.select_related("user", "section", "semester").get(user=user)
                 profile_data = {
                     "student_id": str(profile.id),
@@ -401,7 +402,7 @@ class LoginView(APIView):
                     "academic_status": profile.academic_status,
                 }
 
-            elif user.user_type == "admin":
+            elif user.user_type == "Admin":
                 profile = AdminProfile.objects.select_related("user", "department").get(user=user)
                 profile_data = {
                     "admin_id": str(profile.id),
