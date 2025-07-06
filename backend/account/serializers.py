@@ -1,8 +1,10 @@
-# app/serializers.py
 from rest_framework import serializers
 from .models import User
 from .models import StudentProfile, AdminProfile
 from .models import TeacherProfile, User
+from department.models import Department
+
+
 
 
 
@@ -77,12 +79,6 @@ class AdminProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdminProfile
         fields = '__all__'
-
-
-
-# serializers.py
-from rest_framework import serializers
-from .models import User, TeacherProfile, Department
 
 
 class UserBasicSerializer(serializers.ModelSerializer):
