@@ -47,3 +47,5 @@ export const createQuiz = (data) => api.post(ENDPOINT.quizzes, data); // POST /a
 export const updateQuiz = (quizId, data) => api.put(ENDPOINT.quiz(quizId), data); // PUT /api/quizzes/:id/
 export const patchQuiz = (quizId, data) => api.patch(ENDPOINT.quiz(quizId), data); // PATCH /api/quizzes/:id/
 export const deleteQuiz = (quizId, data) => api.put(ENDPOINT.quiz(quizId), data); // DELETE /api/quizzes/:id/
+
+export const fetchTeacherStudent = (teacherId) => api.get(ENDPOINT.teacherStudent(teacherId)); // GET /api/teachers/:id/students/

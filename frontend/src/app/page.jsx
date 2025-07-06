@@ -23,7 +23,7 @@ function Home() {
 
   return (
     <div>
-      {/* <Teacher /> */}
+      <Teacher />
       <StudentPage />
       {/* <AdminDashboardMain /> */}
     </div>

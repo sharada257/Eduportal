@@ -15,6 +15,7 @@ export const ENDPOINT = {
   subjectTeacherSections: "/subject-teacher-sections/",
   subjectTeacherSection: (id) =>
     `subject-teacher-sections/by_teacher/?teacher_id=${id}`,
+  teacherStudent: (id) => `subject-teacher-sections/by_teacher_student/?teacher_id=${id}`,
 
   assignments: "/assignments/",
   assignment: (id) => `/assignments/${id}/`,

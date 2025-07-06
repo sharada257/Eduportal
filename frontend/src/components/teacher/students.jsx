@@ -9,71 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Search, Users, Mail, BookOpen, GraduationCap } from "lucide-react"
+import useTeacherStudentStore from "@/stores/teacherStudent"
 
-export default function Students({ students: initialStudents, courses }) {
-  const [students] = useState([
-    {
-      id: 1,
-      name: "John Smith",
-      email: "john@email.com",
-      course: "MATH101",
-      section: "A",
-      grade: "A",
-      enrollmentDate: "2024-01-15",
-      status: "active",
-    },
-    {
-      id: 2,
-      name: "Sarah Johnson",
-      email: "sarah@email.com",
-      course: "MATH101",
-      section: "B",
-      grade: "B+",
-      enrollmentDate: "2024-01-15",
-      status: "active",
-    },
-    {
-      id: 3,
-      name: "Mike Davis",
-      email: "mike@email.com",
-      course: "PHY201",
-      section: "A",
-      grade: "A-",
-      enrollmentDate: "2024-01-16",
-      status: "active",
-    },
-    {
-      id: 4,
-      name: "Emily Brown",
-      email: "emily@email.com",
-      course: "CHEM150",
-      section: "A",
-      grade: "B",
-      enrollmentDate: "2024-01-16",
-      status: "active",
-    },
-    {
-      id: 5,
-      name: "Alex Wilson",
-      email: "alex@email.com",
-      course: "MATH101",
-      section: "A",
-      grade: "B",
-      enrollmentDate: "2024-01-17",
-      status: "active",
-    },
-    {
-      id: 6,
-      name: "Lisa Chen",
-      email: "lisa@email.com",
-      course: "PHY201",
-      section: "B",
-      grade: "A",
-      enrollmentDate: "2024-01-17",
-      status: "inactive",
-    },
-  ])
-
+export default function Students({ students, courses }) {
+  const [student]=useTeacherStudentStore((state) => [state.teacherStudents])
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCourse, setSelectedCourse] = useState("all")
   const [selectedSection, setSelectedSection] = useState("all")
