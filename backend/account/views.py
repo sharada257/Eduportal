@@ -5,146 +5,14 @@ from rest_framework.exceptions import NotFound
 from django.db.models import Q
 
 from .models import (
-    User, TeacherProfile,
+   TeacherProfile,
     StudentProfile, AdminProfile
 )
 from .serializers import (
-    UserCreateSerializer, UserUpdateSerializer, UserResponseSerializer, UserSummarySerializer,
     TeacherProfileCreateSerializer, TeacherProfileUpdateSerializer,
-    TeacherProfileDetailSerializer, TeacherProfileListItemSerializer,
+    TeacherProfileDetailSerializer, 
    AdminProfileSerializer
 )
-from .permissions import IsAdminUser, IsTeacher
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserResponseSerializer  # default
-
-    def get_serializer_class(self):
-        if self.action == "create":
-            return UserCreateSerializer
-        elif self.action in ["update", "partial_update"]:
-            return UserUpdateSerializer
-        elif self.action == "list":
-            return UserSummarySerializer
-        return UserResponseSerializer
-
-    def get_queryset(self):
-        queryset = User.objects.all()
-        user_type = self.request.query_params.get("user_type")
-        is_active = self.request.query_params.get("is_active")
-        is_verified = self.request.query_params.get("is_verified")
-        search = self.request.query_params.get("search")
-
-        if user_type:
-            queryset = queryset.filter(user_type=user_type)
-        if is_active is not None:
-            queryset = queryset.filter(is_active=is_active.lower() == 'true')
-        if is_verified is not None:
-            queryset = queryset.filter(is_verified=is_verified.lower() == 'true')
-        if search:
-            queryset = queryset.filter(
-                Q(first_name__icontains=search) |
-                Q(last_name__icontains=search) |
-                Q(email__icontains=search)
-            )
-        return queryset
-
-    def create(self, request, *args, **kwargs):
-        if User.objects.filter(email=request.data.get("email")).exists():
-            return Response({"detail": "Email already registered"}, status=status.HTTP_400_BAD_REQUEST)
-        return super().create(request, *args, **kwargs)
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.is_active = False  # Soft delete
-        instance.save()
-        return Response({"id": str(instance.id)}, status=status.HTTP_200_OK)
-
-
-class TeacherProfileViewSet(viewsets.ModelViewSet):
-    queryset = TeacherProfile.objects.select_related('user', 'department')
-    serializer_class = TeacherProfileDetailSerializer
-
-    def get_permissions(self):
-        if self.action in ['me', 'update_me']:
-            return [IsTeacher()]
-        elif self.action in ['list', 'destroy', 'update', 'partial_update', 'retrieve', 'create']:
-            return [IsAdminUser()]
-        return super().get_permissions()
-
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return TeacherProfileCreateSerializer
-        elif self.action in ['update', 'partial_update']:
-            return TeacherProfileUpdateSerializer
-        elif self.action == 'list':
-            return TeacherProfileListItemSerializer
-        return TeacherProfileDetailSerializer
-
-    def list(self, request):
-        query = self.get_queryset().filter(user__deleted_at__isnull=True)
-        filters = request.query_params
-
-        if eid := filters.get("employee_id"):
-            query = query.filter(employee_id__icontains=eid)
-        if dept := filters.get("department_id"):
-            query = query.filter(department_id=dept)
-        if desg := filters.get("designation"):
-            query = query.filter(designation__icontains=desg)
-        if qual := filters.get("qualification"):
-            query = query.filter(qualification__icontains=qual)
-        if min_exp := filters.get("min_experience"):
-            query = query.filter(experience_years__gte=min_exp)
-        if max_exp := filters.get("max_experience"):
-            query = query.filter(experience_years__lte=max_exp)
-        if active := filters.get("is_active"):
-            query = query.filter(user__is_active=active.lower() == 'true')
-        if created_after := filters.get("created_after"):
-            query = query.filter(created_at__gte=created_after)
-        if created_before := filters.get("created_before"):
-            query = query.filter(created_at__lte=created_before)
-        if search := filters.get("search_query"):
-            query = query.filter(
-                Q(user__first_name__icontains=search) |
-                Q(user__last_name__icontains=search) |
-                Q(employee_id__icontains=search)
-            )
-
-        page = self.paginate_queryset(query)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
-
-    @action(detail=False, methods=['get'], permission_classes=[IsTeacher])
-    def me(self, request):
-        profile = TeacherProfile.objects.filter(user=request.user).first()
-        if not profile:
-            return Response({"detail": "Teacher profile not found"}, status=404)
-        return Response(self.get_serializer(profile).data)
-
-    @action(detail=False, methods=['put'], permission_classes=[IsTeacher])
-    def update_me(self, request):
-        profile = TeacherProfile.objects.filter(user=request.user).first()
-        if not profile:
-            return Response({"detail": "Teacher profile not found"}, status=404)
-        serializer = TeacherProfileUpdateSerializer(profile, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({
-            "success": True,
-            "message": "Teacher profile updated",
-            "data": TeacherProfileDetailSerializer(profile).data
-        })
-
-    def destroy(self, request, *args, **kwargs):
-        profile = self.get_object()
-        if TeacherAssignment.objects.filter(teacher=profile, is_active=True).exists():
-            return Response({"detail": "Cannot delete teacher profile with active assignments"}, status=400)
-        profile.delete()
-        return Response({"success": True, "message": "Teacher profile deleted"}, status=200)
-
-
 from .models import StudentProfile
 from .serializers import (
     StudentProfileListSerializer,
@@ -152,6 +20,8 @@ from .serializers import (
     StudentProfileCreateSerializer,
     StudentProfileUpdateSerializer
 )
+
+
 
 class StudentProfileViewSet(viewsets.ModelViewSet):
     queryset = StudentProfile.objects.filter(is_active=True)
@@ -213,4 +83,123 @@ class StudentProfileViewSet(viewsets.ModelViewSet):
 class AdminProfileViewSet(viewsets.ModelViewSet):
     queryset = AdminProfile.objects.select_related('user', 'department', 'created_by', 'updated_by')
     serializer_class = AdminProfileSerializer
+
+
+# views.py
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+
+from .models import TeacherProfile
+from .serializers import (
+    TeacherProfileListSerializer,
+    TeacherProfileDetailSerializer,
+    TeacherProfileCreateSerializer,
+    TeacherProfileUpdateSerializer
+)
+
+
+class TeacherProfileViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for TeacherProfile with different serializers for different operations
+    """
+    queryset = TeacherProfile.objects.select_related('user', 'department').all()
+    
+    # Add filtering and searching capabilities
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['department', 'user__is_active', 'user__is_verified']
+    search_fields = ['user__email', 'employee_id', 'designation', 'qualification']
+    ordering_fields = ['created_at', 'updated_at', 'experience_years']
+    ordering = ['-created_at']
+    
+    def get_serializer_class(self):
+        """Return different serializers based on action"""
+        if self.action == 'list':
+            return TeacherProfileListSerializer
+        elif self.action == 'retrieve':
+            return TeacherProfileDetailSerializer
+        elif self.action == 'create':
+            return TeacherProfileCreateSerializer
+        elif self.action in ['update', 'partial_update']:
+            return TeacherProfileUpdateSerializer
+        return TeacherProfileDetailSerializer
+    
+    def get_queryset(self):
+        """
+        Optionally filter by user type and active status
+        """
+        queryset = self.queryset
+        
+        # Filter by user type if specified
+        user_type = self.request.query_params.get('user_type')
+        if user_type:
+            queryset = queryset.filter(user__user_type=user_type)
+        
+        # Filter by active status if specified
+        is_active = self.request.query_params.get('is_active')
+        if is_active is not None:
+            queryset = queryset.filter(user__is_active=is_active.lower() == 'true')
+        
+        return queryset
+    
+    def create(self, request, *args, **kwargs):
+        """Create a new teacher profile"""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        teacher_profile = serializer.save()
+        
+        # Return detailed response
+        response_serializer = TeacherProfileDetailSerializer(teacher_profile)
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+    
+    def update(self, request, *args, **kwargs):
+        """Update teacher profile"""
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        teacher_profile = serializer.save()
+        
+        # Return detailed response
+        response_serializer = TeacherProfileDetailSerializer(teacher_profile)
+        return Response(response_serializer.data)
+    
+    @action(detail=True, methods=['get'])
+    def user_info(self, request, pk=None):
+        """Get detailed user information for a teacher"""
+        teacher_profile = self.get_object()
+        user_serializer = UserBasicSerializer(teacher_profile.user)
+        return Response(user_serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def by_department(self, request):
+        """Get teachers grouped by department"""
+        department_id = request.query_params.get('department_id')
+        if not department_id:
+            return Response(
+                {'error': 'department_id parameter is required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        teachers = self.get_queryset().filter(department_id=department_id)
+        serializer = TeacherProfileListSerializer(teachers, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def active_teachers(self, request):
+        """Get all active teachers"""
+        active_teachers = self.get_queryset().filter(user__is_active=True)
+        serializer = TeacherProfileListSerializer(active_teachers, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def verified_teachers(self, request):
+        """Get all verified teachers"""
+        verified_teachers = self.get_queryset().filter(user__is_verified=True)
+        serializer = TeacherProfileListSerializer(verified_teachers, many=True)
+        return Response(serializer.data)
 

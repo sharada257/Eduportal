@@ -22,7 +22,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const studentId = "3f117de0-db97-4eb7-a22c-eff68d9a855e"; // <-- Replace with your dynamic ID if you have routing
+  const studentId = "308176de-092b-4e4e-b953-12c37dcbf65b"; // <-- Replace with your dynamic ID if you have routing
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -42,7 +42,13 @@ export default function Profile() {
     console.log("Saving profile:", profile);
     setSaving(true);
     try {
-      await api.put(ENDPOINT.studentProfile(studentId), profile);
+      console.log(profile);
+      await api.put(ENDPOINT.studentProfile(studentId), {
+        user: {
+          first_name: profile.user.first_name,
+          last_name: profile.user.last_name,
+        },
+      });
       setIsEditing(false);
       // Optional: Show toast/notification of success
     } catch (error) {
@@ -137,7 +143,7 @@ export default function Profile() {
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 <span className="text-sm">
-                  Semester {profile.semester_number}
+                  Semester {profile.current_semester}
                 </span>
               </div>
               <Badge variant="default">Program : {profile.program_type}</Badge>
@@ -201,7 +207,6 @@ export default function Profile() {
           </div>
         </CardContent>
       </Card>
-
 
       {/* Academic Performance */}
       <Card>
