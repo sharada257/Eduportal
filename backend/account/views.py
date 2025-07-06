@@ -329,6 +329,17 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import LoginSerializer  # import it
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth import authenticate, get_user_model
+from rest_framework_simplejwt.tokens import RefreshToken
+from .serializers import LoginSerializer
+from .models import TeacherProfile, StudentProfile, AdminProfile
+import logging
+
+logger = logging.getLogger(__name__)
+
 class LoginView(APIView):
     permission_classes = []
 
@@ -339,14 +350,21 @@ class LoginView(APIView):
         email = serializer.validated_data['email']
         password = serializer.validated_data['password']
 
+        # Try to authenticate the user
         user = authenticate(request, email=email, password=password)
         if not user:
+            logger.warning(f"Login failed for email: {email}")
             return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
         if not user.is_active:
+            logger.warning(f"Inactive user tried to login: {user.email}")
             return Response({"detail": "Account is inactive"}, status=status.HTTP_403_FORBIDDEN)
 
-        refresh = RefreshToken.for_user(user)
+        try:
+            refresh = RefreshToken.for_user(user)
+        except Exception as e:
+            logger.exception("Error creating JWT token")
+            return Response({"detail": "Token generation failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # Get profile based on user_type
         profile_data = None
@@ -354,28 +372,55 @@ class LoginView(APIView):
             if user.user_type == "teacher":
                 profile = TeacherProfile.objects.select_related("user", "department").get(user=user)
                 profile_data = {
-                    "name": user.get_full_name(),
+                    "teacher_id": str(profile.id),
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "email": user.email,
                     "employee_id": profile.employee_id,
                     "department": profile.department.department_name if profile.department else None,
+                    "designation": profile.designation,
+                    "qualification": profile.qualification,
+                    "joined_at": profile.joined_at.strftime("%Y-%m-%d") if profile.joined_at else None,
+                    "experience_years": profile.experience_years,
                 }
 
             elif user.user_type == "student":
                 profile = StudentProfile.objects.select_related("user", "section", "semester").get(user=user)
                 profile_data = {
-                    "name": user.get_full_name(),
+                    "student_id": str(profile.id),
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "email": user.email,
                     "registration_number": profile.registration_number,
-                    "semester": profile.semester.semester_number if profile.semester else None,
                     "section": profile.section.name,
+                    "semester": profile.semester.semester_number if profile.semester else None,
+                    "admission_year": profile.admission_year,
+                    "cgpa": str(profile.cgpa),
+                    "batch_year": profile.batch_year,
+                    "date_of_birth": profile.date_of_birth.strftime("%Y-%m-%d") if profile.date_of_birth else None,
+                    "academic_status": profile.academic_status,
                 }
 
             elif user.user_type == "admin":
                 profile = AdminProfile.objects.select_related("user", "department").get(user=user)
                 profile_data = {
+                    "admin_id": str(profile.id),
                     "name": user.get_full_name(),
+                    "email": user.email,
                     "department": profile.department.department_name if profile.department else None,
                 }
-        except Exception:
-            profile_data = None
+
+            else:
+                logger.error(f"Unknown user_type: {user.user_type} for user {user.email}")
+                return Response({"detail": "Unknown user type"}, status=status.HTTP_400_BAD_REQUEST)
+
+        except (TeacherProfile.DoesNotExist, StudentProfile.DoesNotExist, AdminProfile.DoesNotExist) as e:
+            logger.error(f"Profile not found for user {user.email}: {str(e)}")
+            return Response({"detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            logger.exception("Unexpected error retrieving profile")
+            return Response({"detail": "An unexpected error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({
             "refresh": str(refresh),
@@ -384,7 +429,6 @@ class LoginView(APIView):
             "user_id": str(user.id),
             "profile": profile_data,
         })
-
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
