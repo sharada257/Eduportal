@@ -2,32 +2,27 @@
 import StudentPage from "@/components/student/Page";
 import AdminDashboardMain from "@/components/admin/page";
 import Teacher from "@/components/teacher/page";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import useAuthStore from "@/stores/authStore";
 
-function Home() {
-  const [user, setUser] = useState(null); // can be null | userObj
+export default function Home() {
   const router = useRouter();
-
+  const user = useAuthStore((state) => state.user); 
+  const userType = useAuthStore((state) => state.userType);
+  console.log("User Type:", userType);
+  console.log("User:", user);
   useEffect(() => {
-    // Simulate checking auth (e.g., from localStorage or API)
-    const token = localStorage.getItem("demoUser");
-    if (!token) {
-      router.push("/login"); // 🔁 Redirect if not logged in
-    } else {
-      setUser({ name: "Test User" }); // fake login
+    if (user === null) {
+      router.push("/login");
     }
-  }, []);
-
-  if (!user) return null; // or loading spinner
+  }, [user, router]);
 
   return (
     <div>
-      {/* <Teacher /> */}
-      <StudentPage />
-      {/* <AdminDashboardMain /> */}
+      {userType === "Student" && <StudentPage />}
+      {userType === "teacher" && <Teacher />}
+      {userType === "admin" && <AdminDashboardMain />}
     </div>
   );
 }
-
-export default Home;

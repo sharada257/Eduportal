@@ -5,11 +5,12 @@ const useAuthStore = create(
   devtools(
     persist(
       (set) => ({
-        user: null, // complete user profile data
+        user: null,
         accessToken: null,
         refreshToken: null,
         userType: null,
         userId: null,
+        hydrated: false, // <-- hydration flag
 
         setAuthData: ({ profile, access, refresh, user_type, user_id }) =>
           set(() => ({
@@ -31,6 +32,9 @@ const useAuthStore = create(
       }),
       {
         name: "auth-storage",
+        onRehydrateStorage: () => (state) => {
+          state?.set({ hydrated: true }); // set hydrated to true after rehydration
+        },
       }
     )
   )
