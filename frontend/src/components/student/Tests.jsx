@@ -1,190 +1,95 @@
-import React, { useEffect, useState } from "react";
-import { Calendar, Clock, MapPin, User } from "lucide-react";
-import { api, ENDPOINT } from "@/lib/api";
-import Link from "next/link";
+"use client";
+import React, { useEffect } from "react";
+import { Calendar, AlertCircle } from "lucide-react";
+import useTestStore from "@/stores/useTestsStore"; // adjust path if needed
+import { Card, CardContent } from "@/components/ui/card";
+import {Progress} from "@/components/ui/progress"; // optional: your existing loader component
 
-const Tests = () => {
-  const [tests, setTests] = useState([]);
-  const [loading, setLoading] = useState(true);
+const TestDashboard = () => {
+  const { tests, loading, error, getAllTests } = useTestStore();
 
-  const getStatusColor = (isUpcoming) => {
-    return isUpcoming
-      ? "bg-blue-100 text-blue-800"
-      : "bg-green-100 text-green-800";
-  };
-
+  // Fetch tests on component mount
   useEffect(() => {
-    const fetchTests = async () => {
-      try {
-        const response = await api.get(ENDPOINT.tests);
-        setTests(response.data);
-      } catch (error) {
-        console.error("Failed to fetch tests:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTests();
-  }, []);
+    getAllTests();
+  }, [getAllTests]);
 
+  // Filter upcoming tests based on your `is_upcoming` field
   const upcomingTests = tests.filter((t) => t.is_upcoming);
-  const completedTests = tests.filter((t) => !t.is_upcoming);
 
-  const formatDateTime = (dateStr) => {
-    const date = new Date(dateStr);
-    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    })}`;
-  };
+  const StatCard = ({ title, value, icon }) => (
+    <Card>
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-600">{title}</p>
+            <p className="text-2xl font-bold text-gray-900">{value}</p>
+          </div>
+          {icon}
+        </div>
+      </CardContent>
+    </Card>
+  );
 
-  if (loading) return <div>Loading tests...</div>;
+  if (loading) return <Progress />; // show loader while fetching
+
+  if (error) {
+    return (
+      <div className="text-center text-red-500">
+        <p>Failed to load tests: {error.message || "Unknown error"}</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-8">
-      {/* Upcoming Tests */}
-      <section>
+    <div className="space-y-6">
+      <div>
         <h2 className="text-3xl font-bold text-gray-900">Upcoming Tests</h2>
-        <p className="text-gray-600 mt-2 mb-6">
-          Prepare for your upcoming assessments.
-        </p>
+        <p className="text-gray-600 mt-2">Track your scheduled tests here.</p>
+      </div>
 
-        {upcomingTests.length === 0 && (
-          <p className="text-gray-500">No upcoming tests scheduled.</p>
-        )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <StatCard
+          title="Total Upcoming Tests"
+          value={upcomingTests.length.toString()}
+          icon={<Calendar className="w-6 h-6 text-red-500" />}
+        />
+      </div>
 
-        <div className="space-y-4">
-          {upcomingTests.map((test) => (
-            <Link key={test.id} href = {`/tests/${test.id}`}>
-              <div 
-              className="bg-white rounded-xl shadow border border-gray-200 p-6 hover:shadow-md transition">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-sm font-semibold text-gray-700">
-                      {test.subject_code}
-                    </span>
-                    <span className="text-gray-500">|</span>
-                    <span className="text-sm text-gray-600">
-                      {test.subject_name}
-                    </span>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                        test.is_upcoming
-                      )}`}
-                    >
-                      {test.is_upcoming ? "Upcoming" : "Completed"}
-                    </span>
-                  </div>
-
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">
-                    {test.title}
-                  </h3>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      <span>{formatDateTime(test.scheduled_date)}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
-                      <span>{test.section_name}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4" />
-                      <span>{test.teacher_name}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <div className="text-sm text-gray-500 mb-1">Total Marks</div>
-                  <div className="text-2xl font-bold text-gray-900">
-                    {test.total_marks}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-2">
-                    {test.days_until_test === 0
-                      ? "Today"
-                      : `${test.days_until_test} day(s) left`}
-                  </div>
-                </div>
-              </div>
-              </div>  
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Completed Tests */}
-      {completedTests.length > 0 && (
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-            Completed Tests
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold text-gray-900">
+            Upcoming Test Details
           </h2>
+          <AlertCircle className="w-5 h-5 text-orange-500" />
+        </div>
 
+        {upcomingTests.length === 0 ? (
+          <p className="text-gray-600">No upcoming tests scheduled.</p>
+        ) : (
           <div className="space-y-4">
-            {completedTests.map((test) => (
+            {upcomingTests.map((test) => (
               <div
                 key={test.id}
-                className="bg-white rounded-xl shadow border border-gray-200 p-6"
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-sm font-semibold text-gray-700">
-                        {test.subject_code}
-                      </span>
-                      <span className="text-gray-500">|</span>
-                      <span className="text-sm text-gray-600">
-                        {test.subject_name}
-                      </span>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                          test.is_upcoming
-                        )}`}
-                      >
-                        Completed
-                      </span>
-                    </div>
-
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">
-                      {test.title}
-                    </h3>
-
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        <span>{formatDateTime(test.scheduled_date)}</span>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4" />
-                        <span>{test.section_name}</span>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        <span>{test.teacher_name}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <div className="text-sm text-gray-500 mb-1">Total Marks</div>
-                    <div className="text-2xl font-bold text-gray-900">
-                      {test.total_marks}
-                    </div>
-                  </div>
+                <div className="flex-1">
+                  <h3 className="font-medium text-gray-900">{test.title}</h3>
+                  <p className="text-sm text-gray-700">{test.subject_name}</p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Scheduled:{" "}
+                    {new Date(test.scheduled_date).toLocaleString()}
+                  </p>
+                </div>
+                <div className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                  Test
                 </div>
               </div>
             ))}
           </div>
-        </section>
-      )}
+        )}
+      </div>
     </div>
   );
 };
 
-export default Tests;
+export default TestDashboard;
