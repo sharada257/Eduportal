@@ -393,7 +393,7 @@ class LoginView(APIView):
                     "last_name": user.last_name,
                     "email": user.email,
                     "registration_number": profile.registration_number,
-                    "section": profile.section.name,
+                    "section": profile.section.section_name,
                     "semester": profile.semester.semester_number if profile.semester else None,
                     "admission_year": profile.admission_year,
                     "cgpa": str(profile.cgpa),
