@@ -21,14 +21,14 @@ export default function LoginPage() {
 
     const router = useRouter();
     const setAuthData = useAuthStore((state) => state.setAuthData);
-
+    const user = useAuthStore((state) => state.user);
     useEffect(() => {
-        if (!setAuthData.user) {
+        if (user !== null) {
             setRedirecting(true);
             router.push("/");
             setRedirecting(false) 
         }
-    }, [setAuthData]);
+    }, [user]);
 
     if (redirecting) {
         return (
@@ -41,8 +41,7 @@ export default function LoginPage() {
         );
     }
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
         try {
             if (!email || !password) {
                 alert("Please fill the fields");
@@ -50,13 +49,9 @@ export default function LoginPage() {
             }
             setIsLoading(true);
             const res = await api.post(ENDPOINT.login, { email, password });
-            console.log("Login response:", res.data);
 
             if (res.status === 200) {
-                // store in zustand
                 setAuthData(res.data);
-
-                router.push("/");
             }
         } catch (err) {
             console.error("Login failed:", err);
@@ -117,7 +112,7 @@ export default function LoginPage() {
                             </div>
                         </div>
 
-                        <Button type="submit" className="w-full bg-black text-white hover:bg-gray-500" disabled={isLoading}>
+                        <Button onClick={handleSubmit} type="submit" className="w-full bg-black text-white hover:bg-gray-500" disabled={isLoading}>
                             {isLoading ? (
                                 <div className="flex items-center justify-center">
                                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-200 border-t-white"></div>
