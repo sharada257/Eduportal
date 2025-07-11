@@ -87,7 +87,7 @@ class UserBasicSerializer(serializers.ModelSerializer):
         fields = ['id',"first_name","last_name",'email']
 
 
-class DepartmentSerializer(serializers.ModelSerializer):
+class DepartmentsSerializer(serializers.ModelSerializer):
     """Department info for teacher profile"""
     class Meta:
         model = Department
@@ -97,7 +97,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
 class TeacherProfileListSerializer(serializers.ModelSerializer):
     """Serializer for listing teacher profiles"""
     user = UserBasicSerializer(read_only=True)
-    department = DepartmentSerializer(read_only=True)
+    department = DepartmentsSerializer(read_only=True)
     
     class Meta:
         model = TeacherProfile
@@ -111,7 +111,7 @@ class TeacherProfileListSerializer(serializers.ModelSerializer):
 class TeacherProfileDetailSerializer(serializers.ModelSerializer):
     """Serializer for detailed teacher profile view"""
     user = UserBasicSerializer(read_only=True)
-    department = DepartmentSerializer(read_only=True)
+    department = DepartmentsSerializer(read_only=True)
     
     class Meta:
         model = TeacherProfile
