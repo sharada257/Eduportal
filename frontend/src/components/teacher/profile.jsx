@@ -28,7 +28,6 @@ import useAuthStore from "@/stores/authStore";
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const profile = useAuthStore((state) => state.user);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   console.log("Profile Data:", profile);
 
