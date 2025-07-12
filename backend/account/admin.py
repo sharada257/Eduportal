@@ -22,6 +22,17 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('-created_at',)
     list_per_page = 25
 
+
+    # ✅ Include `user_type` in fieldsets (edit view)
+    fieldsets = BaseUserAdmin.fieldsets + (
+        (None, {"fields": ("user_type",)}),
+    )
+
+    # ✅ Include `user_type` in add_fieldsets (create view)
+    add_fieldsets = BaseUserAdmin.add_fieldsets + (
+        (None, {"fields": ("user_type",)}),
+    )
+
 @admin.register(TeacherProfile)
 class TeacherProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'employee_id', 'designation', 'department', 'experience_years', 'created_at')

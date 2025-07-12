@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import * as teacherApi from "@/lib/api/studentApi"; // adjust path as needed
+import  teacherApi from "@/lib/api/studentApi"; // adjust path as needed
 
 const useTeacherStore = create(
   devtools((set, get) => ({
