@@ -4,7 +4,8 @@ from .views import (
     DepartmentViewSet,
     SemesterViewSet,
     SectionViewSet,
-    SubjectViewSet
+    SubjectViewSet,
+    CourseAssignmentViewSet
 )
 
 # Create a router and register ViewSets
@@ -13,6 +14,7 @@ router.register(r'departments', DepartmentViewSet, basename='department')
 router.register(r'semesters', SemesterViewSet, basename='semester')
 router.register(r'sections', SectionViewSet, basename='section')
 router.register(r'subjects', SubjectViewSet, basename='subject')
+router.register(r'courses', CourseAssignmentViewSet, basename='courseassignment')
 
 # URL patterns
 urlpatterns = [

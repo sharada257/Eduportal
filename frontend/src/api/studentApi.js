@@ -25,9 +25,9 @@ export const patchAdminProfile = (adminId, data) => api.patch(ENDPOINT.adminProf
 export const deleteAdminProfile = (adminId,data) => api.put(ENDPOINT.adminProfile(adminId),data); // DELETE /api/admins/:id/
 
 
-export const fetchSubjectTeacherSections = () => api.get(ENDPOINT.subjectTeacherSections()); // GET /api/subject-teacher-sections/
+export const fetchSubjectTeacherSections = () => api.get(ENDPOINT.subjectTeacherSections); // GET /api/subject-teacher-sections/
 export const fetchSubjectTeacherSection = (teacherId) => api.get(ENDPOINT.subjectTeacherSection(teacherId)); // GET /api/subject-teacher-sections/by_teacher/?teacher_id=teacherId
-export const createSubjectTeacherSection = (data) => api.post(ENDPOINT.subjectTeacherSections(), data); // POST /api/subject-teacher-sections/
+export const createSubjectTeacherSection = (data) => api.post(ENDPOINT.subjectTeacherSections, data); // POST /api/subject-teacher-sections/
 export const updateSubjectTeacherSection = (id, data) => api.put(ENDPOINT.subjectTeacherSection(id), data); // PUT /api/subject-teacher-sections/:id/
 export const patchSubjectTeacherSection = (id, data) => api.patch(ENDPOINT.subjectTeacherSection(id), data); // PATCH /api/subject-teacher-sections/:id/
 export const deleteSubjectTeacherSection = (id, data) => api.put(ENDPOINT.subjectTeacherSection(id), data); // DELETE /api/subject-teacher-sections/:id/

@@ -494,3 +494,37 @@ class SubjectViewSet(viewsets.ModelViewSet):
                 {'error': 'Internal server error occurred'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+            
+            
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Prefetch
+import logging
+
+from .models import CourseAssignment
+from .serializers import CourseAssignmentSerializer
+from account.models import TeacherProfile  # Assuming your TeacherProfile model is here
+
+class CourseAssignmentViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Teachers can view the subjects/sections they're assigned to.
+    """
+    queryset = CourseAssignment.objects.none()
+    serializer_class = CourseAssignmentSerializer
+    # permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.user_type != "Teacher": 
+            return CourseAssignment.objects.none()
+
+        try:
+            teacher_profile = TeacherProfile.objects.get(user=user)
+        except TeacherProfile.DoesNotExist:
+            return CourseAssignment.objects.none()
+
+        return CourseAssignment.objects.filter(teacher=teacher_profile).select_related(
+            "subject", "section", "semester"
+        )

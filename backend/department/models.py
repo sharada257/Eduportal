@@ -68,4 +68,17 @@ class Subject(models.Model):
 
     def __str__(self):
         return self.subject_name
+    
+    
+class CourseAssignment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    teacher = models.ForeignKey('account.TeacherProfile', on_delete=models.CASCADE, related_name='courses')
+    subject = models.ForeignKey('Subject', on_delete=models.CASCADE, related_name='courses')
+    section = models.ForeignKey('Section', on_delete=models.CASCADE, null=True, blank=True)
+    semester = models.ForeignKey('Semester', on_delete=models.CASCADE, null=True, blank=True)
+    assigned_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.teacher.user.get_full_name()} teaches {self.subject.subject_name}"
+
 
