@@ -8,7 +8,7 @@ import useAuthStore from "@/stores/authStore";
 
 export default function Home() {
   const router = useRouter();
-  const user = useAuthStore((state) => state.user); 
+  const user = useAuthStore((state) => state.user);
   const userType = useAuthStore((state) => state.userType);
   console.log("User Type:", userType);
   console.log("User:", user);
@@ -21,8 +21,8 @@ export default function Home() {
   return (
     <div>
       {userType === "Student" && <StudentPage />}
-      {userType === "teacher" && <Teacher />}
-      {userType === "admin" && <AdminDashboardMain />}
+      {userType === "Teacher" && <Teacher />}
+      {userType === "Admin" && <AdminDashboardMain />}
     </div>
   );
 }

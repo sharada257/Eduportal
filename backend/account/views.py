@@ -1,15 +1,34 @@
 import logging
-from django.utils import timezone
 from django.db import transaction, IntegrityError
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import ValidationError, PermissionDenied, NotFound
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
+from .serializers import LoginSerializer  # import it
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth import authenticate, get_user_model
+from rest_framework_simplejwt.tokens import RefreshToken
+from .serializers import LoginSerializer
+from .models import TeacherProfile, StudentProfile, AdminProfile
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 
 from .models import (
     UserTypeEnum,
@@ -321,27 +340,8 @@ class AdminProfileViewSet(BaseViewSet):
             return True
         return False
     
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from django.contrib.auth import authenticate
-from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import LoginSerializer  # import it
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from django.contrib.auth import authenticate, get_user_model
-from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import LoginSerializer
-from .models import TeacherProfile, StudentProfile, AdminProfile
-import logging
-
-logger = logging.getLogger(__name__)
-
 class LoginView(APIView):
-    permission_classes = []
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
@@ -366,7 +366,6 @@ class LoginView(APIView):
             logger.exception("Error creating JWT token")
             return Response({"detail": "Token generation failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        print(user.user_type)
         # Get profile based on user_type
         profile_data = None
         try:

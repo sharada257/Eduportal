@@ -15,10 +15,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { User, Edit, Calendar, BookOpen, Mail } from "lucide-react";
 import { api, ENDPOINT } from "@/lib/api"; // <-- adjust to your path
+import useAuthStore from "@/stores/authStore";
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState(null); // Start with null
+  const profile =useAuthStore((state) => state.user);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -45,8 +46,8 @@ export default function Profile() {
       console.log(profile);
       await api.put(ENDPOINT.studentProfile(studentId), {
         user: {
-          first_name: profile.user.first_name,
-          last_name: profile.user.last_name,
+          first_name: profile.first_name,
+          last_name: profile.last_name,
         },
       });
       setIsEditing(false);
@@ -104,28 +105,28 @@ export default function Profile() {
               {isEditing ? (
                 <>
                   <Input
-                    value={profile.user.first_name}
+                    value={profile.first_name}
                     onChange={(e) =>
                       setProfile({
                         ...profile,
-                        user: { ...profile.user, first_name: e.target.value },
+                        user: { ...profile, first_name: e.target.value },
                       })
                     }
                     className="mb-2 sm:mb-0"
                   />
                   <Input
-                    value={profile.user.last_name}
+                    value={profile.last_name}
                     onChange={(e) =>
                       setProfile({
                         ...profile,
-                        user: { ...profile.user, last_name: e.target.value },
+                        user: { ...profile, last_name: e.target.value },
                       })
                     }
                   />
                 </>
               ) : (
                 <h3 className="text-2xl font-bold">
-                  {profile.user.first_name} {profile.user.last_name}
+                  {profile.first_name} {profile.last_name}
                 </h3>
               )}
             </div>
@@ -134,7 +135,7 @@ export default function Profile() {
             <div className="flex flex-wrap items-center gap-2">
               <Mail className="w-4 h-4" />
               <span className="text-md text-gray-500">
-                {profile.user.email}
+                {profile.email}
               </span>
             </div>
           </div>

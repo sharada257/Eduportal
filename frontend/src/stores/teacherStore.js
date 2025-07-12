@@ -20,7 +20,7 @@ const useTeacherStore = create(
         });
       }
     },
-
+    
     addTeacher: async (data) => {
       try {
         const res = await teacherApi.createTeacherProfile(data);
@@ -38,9 +38,7 @@ const useTeacherStore = create(
       try {
         const res = await teacherApi.updateTeacherProfile(id, data);
         set((state) => ({
-          teachers: state.teachers.map((t) =>
-            t.id === id ? res.data : t
-          ),
+          teachers: state.teachers.map((t) => (t.id === id ? res.data : t)),
         }));
       } catch (err) {
         set({
