@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Department, Semester, Section, Subject
+from .models import Department, Semester, Section, Subject, CourseAssignment
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -217,3 +217,19 @@ class SectionSubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Section
         fields = ['id', 'section_name', 'subjects']
+        
+        
+class CourseAssignmentSerializer(serializers.ModelSerializer):
+    subject_name = serializers.CharField(source="subject.subject_name", read_only=True)
+    section_name = serializers.CharField(source="section.section_name", read_only=True)
+    semester_number = serializers.IntegerField(source="semester.semester_number", read_only=True)
+
+    class Meta:
+        model = CourseAssignment
+        fields = [
+            "id",
+            "subject_name",
+            "section_name",
+            "semester_number",
+            "assigned_at",
+        ]

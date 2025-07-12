@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Department, Section, Subject,Semester
+from .models import Department, Section, Subject,Semester, CourseAssignment
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
@@ -24,10 +24,6 @@ class SubjectAdmin(admin.ModelAdmin):
     autocomplete_fields = ['department']
     list_per_page = 25  # Pagination
 
-
-from django.contrib import admin
-from .models import Semester
-
 @admin.register(Semester)
 class SemesterAdmin(admin.ModelAdmin):
     list_display = (
@@ -50,3 +46,9 @@ class SemesterAdmin(admin.ModelAdmin):
         'department__name'
     )
     ordering = ('start_date',)
+
+@admin.register(CourseAssignment)
+class CourseAssignmentAdmin(admin.ModelAdmin):
+    list_display = ('id', 'teacher', 'subject', 'semester', 'section')
+    search_fields = ('teacher__user__first_name', 'teacher__user__email', 'subject__subject_name')
+    list_filter = ('semester', 'section')

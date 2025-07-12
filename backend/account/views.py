@@ -54,7 +54,6 @@ from .serializers import (
 
 logger = logging.getLogger(__name__)
 
-
 class StudentProfileViewSet(viewsets.ModelViewSet):
     queryset = StudentProfile.objects.filter(is_active=True)
 
@@ -351,7 +350,7 @@ class LoginView(APIView):
         password = serializer.validated_data['password']
 
         # Try to authenticate the user
-        user = authenticate(request, email=email, password=password)
+        user = authenticate(request, username=email, password=password)
         if not user:
             logger.warning(f"Login failed for email: {email}")
             return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
