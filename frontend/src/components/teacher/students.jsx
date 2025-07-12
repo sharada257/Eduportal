@@ -1,59 +1,73 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Search, Users, Mail, BookOpen, GraduationCap } from "lucide-react"
-import useTeacherStudentStore from "@/stores/teacherStudent"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Search, Users, Mail, BookOpen, GraduationCap } from "lucide-react";
+import useTeacherStudentStore from "@/stores/teacherStudent";
 
-export default function Students({courses }) {
-  const [students]=useTeacherStudentStore((state) => [state.teacherStudents])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedCourse, setSelectedCourse] = useState("all")
-  const [selectedSection, setSelectedSection] = useState("all")
-  const [selectedStatus, setSelectedStatus] = useState("all")
+export default function Students({ courses }) {
+  const students = useTeacherStudentStore((state) => [state.teacherStudents]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("all");
+  const [selectedSection, setSelectedSection] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState("all");
 
-  const sections = ["A", "B", "C"]
+  const sections = ["A", "B", "C"];
 
   const filteredStudents = students.filter((student) => {
     const matchesSearch =
       student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCourse = selectedCourse === "all" || student.course === selectedCourse
-    const matchesSection = selectedSection === "all" || student.section === selectedSection
-    const matchesStatus = selectedStatus === "all" || student.status === selectedStatus
+      student.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCourse =
+      selectedCourse === "all" || student.course === selectedCourse;
+    const matchesSection =
+      selectedSection === "all" || student.section === selectedSection;
+    const matchesStatus =
+      selectedStatus === "all" || student.status === selectedStatus;
 
-    return matchesSearch && matchesCourse && matchesSection && matchesStatus
-  })
+    return matchesSearch && matchesCourse && matchesSection && matchesStatus;
+  });
 
   const getStudentStats = () => {
-    const total = students.length
-    const active = students.filter((s) => s.status === "active").length
-    const byGrade = students.reduce(
-      (acc, student) => {
-        const grade = student.grade.charAt(0)
-        acc[grade] = (acc[grade] || 0) + 1
-        return acc
-      },
-      {} ,
-    )
+    const total = students.length;
+    const active = students.filter((s) => s.status === "active").length;
+    const byGrade = students.reduce((acc, student) => {
+      const grade = student.grade.charAt(0);
+      acc[grade] = (acc[grade] || 0) + 1;
+      return acc;
+    }, {});
 
-    return { total, active, byGrade }
-  }
+    return { total, active, byGrade };
+  };
 
-  const stats = getStudentStats()
+  const stats = getStudentStats();
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-semibold">Students</h2>
-          <p className="text-gray-600">Manage and track your students across all courses</p>
+          <p className="text-gray-600">
+            Manage and track your students across all courses
+          </p>
         </div>
       </div>
 
@@ -63,8 +77,12 @@ export default function Students({courses }) {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Students</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Total Students
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats.total}
+                </p>
               </div>
               <Users className="w-6 h-6 text-blue-600" />
             </div>
@@ -75,7 +93,9 @@ export default function Students({courses }) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Active</p>
-                <p className="text-2xl font-bold text-green-600">{stats.active}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {stats.active}
+                </p>
               </div>
               <GraduationCap className="w-6 h-6 text-green-600" />
             </div>
@@ -86,7 +106,9 @@ export default function Students({courses }) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">A Grades</p>
-                <p className="text-2xl font-bold text-purple-600">{stats.byGrade.A || 0}</p>
+                <p className="text-2xl font-bold text-purple-600">
+                  {stats.byGrade.A || 0}
+                </p>
               </div>
               <BookOpen className="w-6 h-6 text-purple-600" />
             </div>
@@ -97,7 +119,9 @@ export default function Students({courses }) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">B+ Grades</p>
-                <p className="text-2xl font-bold text-orange-600">{stats.byGrade.B || 0}</p>
+                <p className="text-2xl font-bold text-orange-600">
+                  {stats.byGrade.B || 0}
+                </p>
               </div>
               <Mail className="w-6 h-6 text-orange-600" />
             </div>
@@ -139,7 +163,10 @@ export default function Students({courses }) {
             </div>
             <div>
               <Label className="text-sm font-medium">Section</Label>
-              <Select value={selectedSection} onValueChange={setSelectedSection}>
+              <Select
+                value={selectedSection}
+                onValueChange={setSelectedSection}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="All Sections" />
                 </SelectTrigger>
@@ -169,10 +196,10 @@ export default function Students({courses }) {
             <Button
               variant="outline"
               onClick={() => {
-                setSearchTerm("")
-                setSelectedCourse("all")
-                setSelectedSection("all")
-                setSelectedStatus("all")
+                setSearchTerm("");
+                setSelectedCourse("all");
+                setSelectedSection("all");
+                setSelectedStatus("all");
               }}
             >
               Clear Filters
@@ -228,8 +255,12 @@ export default function Students({courses }) {
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{student.name}</div>
-                          <div className="text-sm text-gray-500">{student.email}</div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {student.name}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {student.email}
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -237,13 +268,29 @@ export default function Students({courses }) {
                       <Badge variant="outline">{student.course}</Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge variant="secondary">Section {student.section}</Badge>
+                      <Badge variant="secondary">
+                        Section {student.section}
+                      </Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge variant={student.grade.startsWith("A") ? "default" : "secondary"}>{student.grade}</Badge>
+                      <Badge
+                        variant={
+                          student.grade.startsWith("A")
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
+                        {student.grade}
+                      </Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge variant={student.status === "active" ? "default" : "outline"}>{student.status}</Badge>
+                      <Badge
+                        variant={
+                          student.status === "active" ? "default" : "outline"
+                        }
+                      >
+                        {student.status}
+                      </Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <Button size="sm" variant="ghost">
@@ -258,5 +305,5 @@ export default function Students({courses }) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

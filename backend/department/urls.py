@@ -18,7 +18,7 @@ router.register(r'courses', CourseAssignmentViewSet, basename='courseassignment'
 
 # URL patterns
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path('', include(router.urls)),
 ]
 
 # Available endpoints:

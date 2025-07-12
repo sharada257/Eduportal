@@ -494,12 +494,7 @@ class SubjectViewSet(viewsets.ModelViewSet):
                 {'error': 'Internal server error occurred'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-            
-            
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django.db.models import Prefetch
+
 import logging
 
 from .models import CourseAssignment
@@ -512,7 +507,7 @@ class CourseAssignmentViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = CourseAssignment.objects.none()
     serializer_class = CourseAssignmentSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
