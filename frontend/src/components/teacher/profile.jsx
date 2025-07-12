@@ -23,14 +23,16 @@ import {
   Building,
 } from "lucide-react";
 import { api, ENDPOINT } from "@/lib/api";
+import useAuthStore from "@/stores/authStore";
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState();
+  const profile = useAuthStore((state) => state.user);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  console.log(profile);
 
-  const teacherId = "4d309d03-3bb7-4bc5-8817-01237437c7ec"; // Replace with your dynamic ID if you have routing
+  const teacherId = "fef0a64b-fd58-4c1f-b818-eac7cbb7941"; // Replace with your dynamic ID if you have routing
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -52,8 +54,8 @@ export default function Profile() {
       console.log(profile);
       await api.put(ENDPOINT.teacher(teacherId), {
         user: {
-          first_name: profile.user.first_name,
-          last_name: profile.user.last_name,
+          first_name: profile.first_name,
+          last_name: profile.last_name,
         },
       });
       setIsEditing(false);
@@ -113,7 +115,7 @@ export default function Profile() {
             </Avatar>
             <div className="flex-1">
               <h3 className="text-2xl font-bold">
-                {profile.user.first_name} {profile.user.last_name}
+                {profile.first_name} {profile.last_name}
               </h3>
               <p className="text-gray-500">
                 {profile.department.department_name}
@@ -155,8 +157,8 @@ export default function Profile() {
               <Input
                 id="name"
                 value={
-                  profile.user.first_name && profile.user.last_name
-                    ? `${profile.user.first_name} ${profile.user.last_name}`
+                  profile.first_name && profile.last_name
+                    ? `${profile.first_name} ${profile.last_name}`
                     : ""
                 }
                 onChange={(e) =>
@@ -173,7 +175,7 @@ export default function Profile() {
                 <Input
                   id="email"
                   type="email"
-                  value={profile.user.email}
+                  value={profile.email}
                   disabled
                   className={`pl-10 ${!isEditing ? "bg-gray-50" : ""}`}
                 />

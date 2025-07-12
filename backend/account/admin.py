@@ -1,11 +1,11 @@
 from django.contrib import admin
 from .models import User, TeacherProfile, StudentProfile, AdminProfile
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(BaseUserAdmin):
     model = User
-    list_display = "__all__"
     list_display = (
         "username",
         "email",
@@ -21,9 +21,6 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ('email', 'username', 'first_name', 'last_name')
     ordering = ('-created_at',)
     list_per_page = 25
-
-    
-
 
 @admin.register(TeacherProfile)
 class TeacherProfileAdmin(admin.ModelAdmin):

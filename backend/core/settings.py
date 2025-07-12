@@ -26,6 +26,7 @@ env = environ.Env(
 # Read .env file
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -49,6 +50,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',  # required for Django collectstatic discovery
     "department",
     "account",
     "assessment",
@@ -166,6 +169,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
 }
 
 

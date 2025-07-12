@@ -11,8 +11,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Search, Users, Mail, BookOpen, GraduationCap } from "lucide-react"
 import useTeacherStudentStore from "@/stores/teacherStudent"
 
-export default function Students({ students, courses }) {
-  const [student]=useTeacherStudentStore((state) => [state.teacherStudents])
+export default function Students({courses }) {
+  const [students]=useTeacherStudentStore((state) => [state.teacherStudents])
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCourse, setSelectedCourse] = useState("all")
   const [selectedSection, setSelectedSection] = useState("all")
