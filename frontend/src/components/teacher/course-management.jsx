@@ -37,7 +37,7 @@ export default function CourseManagement() {
   const updateCourse = useTeacherCourseStore((state) => state.updateCourse);
   const patchCourse = useTeacherCourseStore((state) => state.patchCourse);
 
-  const teacherId = "4d309d03-3bb7-4bc5-8817-01237437c7ec";
+  const teacherId = "43a7ee34-9e08-4ab9-958a-1c826cb77860";
   useEffect(() => {
     getCoursesByTeacher(teacherId);
   }, [teacherId]);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -21,10 +21,20 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Search, Users, Mail, BookOpen, GraduationCap } from "lucide-react";
-import useTeacherStudentStore from "@/stores/teacherStudent";
+import useTeacherStudentStore from "@/stores/teacherStudentStore";
+import useAuthStore from "@/stores/authStore";
 
 export default function Students({ courses }) {
-  const students = useTeacherStudentStore((state) => [state.teacherStudents]);
+  const students = useTeacherStudentStore((state) => state.teacherStudents);
+  const fetchStudents = useTeacherStudentStore((state) => state.fetchStudents);
+  const profile = useAuthStore((state) => state.user);
+  console.log(profile);
+
+  useEffect(() => {
+    fetchStudents(profile.teacher_id);
+  }, [fetchStudents]);
+  console.log(students);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("all");
   const [selectedSection, setSelectedSection] = useState("all");
@@ -34,7 +44,7 @@ export default function Students({ courses }) {
 
   const filteredStudents = students.filter((student) => {
     const matchesSearch =
-      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCourse =
       selectedCourse === "all" || student.course === selectedCourse;
@@ -50,7 +60,7 @@ export default function Students({ courses }) {
     const total = students.length;
     const active = students.filter((s) => s.status === "active").length;
     const byGrade = students.reduce((acc, student) => {
-      const grade = student.grade.charAt(0);
+      const grade = "a";
       acc[grade] = (acc[grade] || 0) + 1;
       return acc;
     }, {});
@@ -248,7 +258,7 @@ export default function Students({ courses }) {
                       <div className="flex items-center">
                         <Avatar className="w-8 h-8 mr-3">
                           <AvatarFallback>
-                            {student.name
+                            {student.first_name
                               .split(" ")
                               .map((n) => n[0])
                               .join("")}
@@ -273,15 +283,7 @@ export default function Students({ courses }) {
                       </Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge
-                        variant={
-                          student.grade.startsWith("A")
-                            ? "default"
-                            : "secondary"
-                        }
-                      >
-                        {student.grade}
-                      </Badge>
+                      <Badge>{student.grade}</Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Badge

@@ -14,80 +14,8 @@ import Settings from "./settings";
 export default function TeacherDashboard() {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const [courses, setCourses] = useState([
-    {
-      id: 1,
-      name: "Mathematics 101",
-      code: "MATH101",
-      students: 25,
-      description: "Basic Mathematics",
-      notes: [
-        {
-          id: 1,
-          title: "Chapter 1: Introduction",
-          content: "Basic concepts and definitions in mathematics",
-          date: "2024-01-15",
-          type: "lecture",
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: "Physics Advanced",
-      code: "PHY201",
-      students: 18,
-      description: "Advanced Physics Concepts",
-      notes: [
-        {
-          id: 2,
-          title: "Newton's Laws",
-          content: "Three fundamental laws of motion",
-          date: "2024-01-16",
-          type: "lecture",
-        },
-      ],
-    },
-    {
-      id: 3,
-      name: "Chemistry Lab",
-      code: "CHEM150",
-      students: 22,
-      description: "Laboratory Chemistry",
-      notes: [],
-    },
-  ]);
-
-  const [students, setStudents] = useState([
-    {
-      id: 1,
-      name: "John Smith",
-      email: "john@email.com",
-      course: "MATH101",
-      grade: "A",
-    },
-    {
-      id: 2,
-      name: "Sarah Johnson",
-      email: "sarah@email.com",
-      course: "MATH101",
-      grade: "B+",
-    },
-    {
-      id: 3,
-      name: "Mike Davis",
-      email: "mike@email.com",
-      course: "PHY201",
-      grade: "A-",
-    },
-    {
-      id: 4,
-      name: "Emily Brown",
-      email: "emily@email.com",
-      course: "CHEM150",
-      grade: "B",
-    },
-  ]);
+  const [courses, setCourses] = useState([]);
+  const [students, setStudents] = useState([]);
 
   const [assignments, setAssignments] = useState([
     {
@@ -174,31 +102,30 @@ export default function TeacherDashboard() {
     }
   };
 
-    return (
-      <div className="min-h-screen bg-gray-50 flex">
-        {/* Sidebar */}
-        <div
-          className={`fixed top-0 left-0 z-50 h-full bg-white shadow-lg transition-all duration-300 ${
-            isSidebarOpen ? "w-64" : "w-16"
-          }`}
-          onMouseEnter={() => setIsSidebarOpen(true)}
-          onMouseLeave={() => setIsSidebarOpen(false)}
-        >
-          <Sidebar
-            activeSection={activeSection}
-            setActiveSection={setActiveSection}
-          />
-        </div>
-  
-        {/* Content */}
-        <div
-          className={`transition-all duration-300 flex-1 h-screen overflow-auto p-6 ${
-            isSidebarOpen ? "ml-64" : "ml-16"
-          }`}
-        >
-          <div className="max-w-7xl mx-auto">{renderContent()}</div>
-        </div>
+  return (
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
+      <div
+        className={`fixed top-0 left-0 z-50 h-full bg-white shadow-lg transition-all duration-300 ${
+          isSidebarOpen ? "w-64" : "w-16"
+        }`}
+        onMouseEnter={() => setIsSidebarOpen(true)}
+        onMouseLeave={() => setIsSidebarOpen(false)}
+      >
+        <Sidebar
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+        />
       </div>
-    );
-  }
-  
+
+      {/* Content */}
+      <div
+        className={`transition-all duration-300 flex-1 h-screen overflow-auto p-6 ${
+          isSidebarOpen ? "ml-64" : "ml-16"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto">{renderContent()}</div>
+      </div>
+    </div>
+  );
+}

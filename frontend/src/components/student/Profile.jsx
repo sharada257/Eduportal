@@ -13,43 +13,103 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { User, Edit, Calendar, BookOpen, Mail } from "lucide-react";
-import { api, ENDPOINT } from "@/lib/api"; // <-- adjust to your path
+import { User, Edit, Calendar, BookOpen, Mail, Save } from "lucide-react";
+import { api, ENDPOINT } from "@/lib/api";
 import useAuthStore from "@/stores/authStore";
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
-  const profile =useAuthStore((state) => state.user);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [formData, setFormData] = useState({
+    first_name: "",
+    last_name: "",
+  });
 
-  const studentId = "3f117de0-db97-4eb7-a22c-eff68d9a855e"; // <-- Replace with your dynamic ID if you have routing
+  // Get data from Zustand store
+  const { user: profile, userId, hydrated, setAuthData } = useAuthStore();
 
+  // Debug logging
+  console.log("Profile Component State:", {
+    hydrated,
+    userId,
+    profile: profile ? "Profile exists" : "No profile",
+    loading,
+  });
+
+  // Initialize form data when profile is available
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await api.get(ENDPOINT.studentProfile(studentId));
-        setProfile(response.data);
-      } catch (error) {
-        console.error("Failed to fetch profile:", error);
-      } finally {
+    if (profile) {
+      setFormData({
+        first_name: profile.first_name || "",
+        last_name: profile.last_name || "",
+      });
+    }
+  }, [profile]);
+
+  // Fetch fresh profile data if needed
+  const fetchProfile = async () => {
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const response = await api.get(ENDPOINT.studentProfile(userId));
+      // Update the store with fresh data
+      setAuthData({
+        profile: response.data,
+        access: useAuthStore.getState().accessToken,
+        refresh: useAuthStore.getState().refreshToken,
+        user_type: useAuthStore.getState().userType,
+        user_id: userId,
+      });
+    } catch (error) {
+      console.error("Failed to fetch profile:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle component initialization
+  useEffect(() => {
+    if (hydrated) {
+      // If we already have profile data, no need to fetch
+      if (profile) {
+        setLoading(false);
+      } else if (userId) {
+        // If we have userId but no profile, fetch it
+        fetchProfile();
+      } else {
+        // If we don't have userId, stop loading
         setLoading(false);
       }
-    };
-    fetchProfile();
-  }, [studentId]);
+    }
+  }, [hydrated, userId, profile]);
 
   const handleSave = async () => {
-    console.log("Saving profile:", profile);
+    if (!userId) return;
+    
+    console.log("Saving profile:", formData);
     setSaving(true);
     try {
-      console.log(profile);
-      await api.put(ENDPOINT.studentProfile(studentId), {
+      await api.put(ENDPOINT.studentProfile(userId), {
         user: {
-          first_name: profile.first_name,
-          last_name: profile.last_name,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
         },
       });
+      
+      // Update the store with new data
+      setAuthData({
+        profile: { ...profile, ...formData },
+        access: useAuthStore.getState().accessToken,
+        refresh: useAuthStore.getState().refreshToken,
+        user_type: useAuthStore.getState().userType,
+        user_id: userId,
+      });
+      
       setIsEditing(false);
       // Optional: Show toast/notification of success
     } catch (error) {
@@ -60,10 +120,27 @@ export default function Profile() {
     }
   };
 
+  // Wait for hydration
+  if (hydrated) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-96">
         <p className="text-gray-500">Loading profile...</p>
+      </div>
+    );
+  }
+
+  if (!profile && !userId) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <p className="text-red-500">No user session found. Please login.</p>
       </div>
     );
   }
@@ -96,8 +173,8 @@ export default function Profile() {
       <Card>
         <CardContent className="p-6 flex flex-col sm:flex-row gap-6 items-center">
           <Avatar className="w-20 h-20">
-            <AvatarFallback className="text-3xl font-semibold">
-              <User className="2xl" />
+            <AvatarFallback className="text-xl font-semibold">
+              <User/>
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 w-full">
@@ -105,21 +182,23 @@ export default function Profile() {
               {isEditing ? (
                 <>
                   <Input
-                    value={profile.first_name}
+                    placeholder="First Name"
+                    value={formData.first_name}
                     onChange={(e) =>
-                      setProfile({
-                        ...profile,
-                        user: { ...profile, first_name: e.target.value },
+                      setFormData({
+                        ...formData,
+                        first_name: e.target.value,
                       })
                     }
                     className="mb-2 sm:mb-0"
                   />
                   <Input
-                    value={profile.last_name}
+                    placeholder="Last Name"
+                    value={formData.last_name}
                     onChange={(e) =>
-                      setProfile({
-                        ...profile,
-                        user: { ...profile, last_name: e.target.value },
+                      setFormData({
+                        ...formData,
+                        last_name: e.target.value,
                       })
                     }
                   />
@@ -144,12 +223,12 @@ export default function Profile() {
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 <span className="text-sm">
-                  Semester {profile.current_semester}
+                  Semester {profile.semester}
                 </span>
               </div>
-              <Badge variant="default">Program : {profile.program_type}</Badge>
+              <Badge variant="default">Program : B.E</Badge>
               <Badge variant="secondary">
-                Batch : {profile.admission_year} - {profile.batch_year}
+                Batch : {profile.batch_year} - {profile.admission_year}
               </Badge>
             </div>
           </div>
@@ -171,7 +250,7 @@ export default function Profile() {
               <Input
                 id="admission_year"
                 type="number"
-                value={profile.admission_year}
+                value={profile.admission_year || ""}
                 disabled
                 className="bg-gray-50"
               />
@@ -181,7 +260,7 @@ export default function Profile() {
               <Input
                 id="batch_year"
                 type="number"
-                value={profile.batch_year}
+                value={profile.batch_year || ""}
                 disabled
                 className="bg-gray-50"
               />
@@ -191,7 +270,7 @@ export default function Profile() {
               <Input
                 id="current_semester"
                 type="number"
-                value={profile.current_semester}
+                value={profile.semester || ""}
                 disabled
                 className="bg-gray-50"
               />
@@ -200,7 +279,7 @@ export default function Profile() {
               <Label htmlFor="program_type">Program Type</Label>
               <Input
                 id="program_type"
-                value={profile.program_type}
+                value={profile.program_type || "B.E"}
                 disabled
                 className="bg-gray-50"
               />
@@ -218,19 +297,19 @@ export default function Profile() {
         <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center p-4 bg-blue-50 rounded-lg">
             <div className="text-2xl font-bold text-blue-600">
-              {profile.cgpa}
+              {profile.cgpa || "N/A"}
             </div>
             <div className="text-sm text-gray-600">CGPA</div>
           </div>
           <div className="text-center p-4 bg-green-50 rounded-lg">
             <div className="text-2xl font-bold text-green-600">
-              {profile.sgpa_current}
+              {profile.sgpa || "N/A"}
             </div>
             <div className="text-sm text-gray-600">Current SGPA</div>
           </div>
           <div className="text-center p-4 bg-purple-50 rounded-lg">
             <div className="text-lg font-bold text-purple-600">
-              {profile.total_credits_completed}/{profile.total_credits_required}
+              {profile.total_credits_completed || 0}/{profile.total_credits_required || 0}
             </div>
             <div className="text-sm text-gray-600">Credits Completed</div>
           </div>
@@ -247,6 +326,7 @@ export default function Profile() {
                 disabled={saving}
                 className="flex items-center gap-2"
               >
+                <Save className="w-4 h-4" />
                 {saving ? "Saving..." : "Save Changes"}
               </Button>
               <Button variant="outline" onClick={() => setIsEditing(false)}>

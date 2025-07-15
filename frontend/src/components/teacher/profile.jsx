@@ -28,30 +28,12 @@ import useAuthStore from "@/stores/authStore";
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const profile = useAuthStore((state) => state.user);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  console.log(profile);
-
-  const teacherId = "fef0a64b-fd58-4c1f-b818-eac7cbb7941"; // Replace with your dynamic ID if you have routing
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await api.get(ENDPOINT.teacher(teacherId));
-        setProfile(response.data);
-      } catch (error) {
-        console.error("Failed to fetch profile:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [teacherId]);
+  console.log("Profile Data:", profile);
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      console.log(profile);
       await api.put(ENDPOINT.teacher(teacherId), {
         user: {
           first_name: profile.first_name,
@@ -67,14 +49,6 @@ export default function Profile() {
       setSaving(false);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-96">
-        <p className="text-gray-500">Loading profile...</p>
-      </div>
-    );
-  }
 
   if (!profile) {
     return (

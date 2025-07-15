@@ -1,59 +1,58 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Home,
   BookOpen,
-  HelpCircle,
+  ClipboardList,
   FileText,
-  User,
-  GraduationCap,
-  StickyNote,
+  CheckCircle,
+  NotebookPen,
+  User2,
 } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
 
-const navItems = [
-  { id: "dashboard", label: "Dashboard", icon: Home },
-  { id: "assignments", label: "Assignments", icon: BookOpen },
-  { id: "quizzes", label: "Quizzes", icon: HelpCircle },
-  { id: "tests", label: "Tests", icon: FileText },
-  { id: "grades", label: "Grades", icon: GraduationCap },
-  { id: "notes", label: "Study Notes", icon: StickyNote },
-  { id: "profile", label: "Profile", icon: User },
+const items = [
+  { href: "/student", label: "Dashboard", Icon: Home },
+  { href: "/student/assignments", label: "Assignments", Icon: ClipboardList },
+  { href: "/student/quizzes", label: "Quizzes", Icon: BookOpen },
+  { href: "/student/tests", label: "Tests", Icon: FileText },
+  { href: "/student/grades", label: "Grades", Icon: CheckCircle },
+  { href: "/student/notes", label: "Notes", Icon: NotebookPen },
+  { href: "/student/profile", label: "Profile", Icon: User2 },
 ];
 
-const Navigation = ({ currentPage, onPageChange }) => {
+export default function Navigation() {
+  const pathname = usePathname();
+
   return (
-    <div className="group bg-white shadow-lg w-16 hover:w-64 transition-all duration-300 border-r h-screen flex flex-col">
-      <div className="p-4">
-        <div className="flex felx-col items-center justify-between ">
-          <h1 className="font-bold text-lg  text-gray-900 opacity-0 group-hover:opacity-100 transition-opacity">
-            StudentHub
-          </h1>
-        </div>
+    <nav className="group w-16 hover:w-64 transition-all duration-200 bg-white border-r overflow-hidden min-h-screen">
+      {/* Student Portal Title */}
+      <div className="flex items-center gap-3 px-3 py-4">
+        <span className="text-sm font-bold text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          Student Portal
+        </span>
       </div>
 
-      <Separator />
-
-      <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
-        {navItems.map((item) => {
-          const Icon = item.icon;
+      <ul className="space-y-1 px-2">
+        {items.map(({ href, label, Icon }) => {
+          const active = pathname === href;
           return (
-            <Button
-              key={item.id}
-              variant={currentPage === item.id ? "default" : "ghost"}
-              className="w-full justify-start text-black bg-white hover:bg-black hover:text-white px-2 transition-all"
-              onClick={() => onPageChange(item.id)}
-            >
-              <Icon className="w-4 h-4 flex-shrink-0" />
-              <span className="ml-3 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                {item.label}
-              </span>
-            </Button>
+            <li key={href}>
+              <Link
+                href={href}
+                className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors
+                  ${active ? "bg-gray-200 font-medium" : "hover:bg-gray-100"}`}
+              >
+                <Icon size={18} className="w-4 h-4 flex-shrink-0"/>
+                <span className="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  {label}
+                </span>
+              </Link>
+            </li>
           );
         })}
-      </nav>
-    </div>
+      </ul>
+    </nav>
   );
-};
-
-export default Navigation;
+}

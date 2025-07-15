@@ -5,7 +5,7 @@ import useTestStore from "@/stores/useTestsStore"; // adjust path if needed
 import { Card, CardContent } from "@/components/ui/card";
 import {Progress} from "@/components/ui/progress"; // optional: your existing loader component
 
-const TestDashboard = () => {
+const Tests = () => {
   const { tests, loading, error, getAllTests } = useTestStore();
 
   // Fetch tests on component mount
@@ -92,4 +92,4 @@ const TestDashboard = () => {
   );
 };
 
-export default TestDashboard;
+export default Tests;
