@@ -26,7 +26,7 @@ export const ENDPOINT = {
   tests: "/tests",
   test: (id) => `/tests/${id}/`,
 
-  submissions: "/submisssions/",
+  submissions: "/submissions/",
   submission: (id) => `/submissions/${id}/`,
 
   teachers: "/teacher-profiles/",

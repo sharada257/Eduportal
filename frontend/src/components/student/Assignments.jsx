@@ -48,7 +48,7 @@ const Assignments = () => {
 
       <div className="space-y-4">
         {assignments.map((assignment) => (
-          <Link href={`/assignments/${assignment.id}`} key={assignment.id}>
+          <Link href={`/student/assignments/${assignment.id}`} key={assignment.id}>
             <div
               className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow"
             >

@@ -57,7 +57,7 @@ class Submission(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.SET_NULL, null=True, blank=True)
     test = models.ForeignKey(Test, on_delete=models.SET_NULL, null=True, blank=True)
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name="submissions")
-    type = models.CharField(max_length=20, choices=[(tag.name, tag.value) for tag in SubmissionType])
+    type = models.CharField(max_length=20, choices=[(tag.value, tag.value.title()) for tag in SubmissionType])
     submitted_at = models.DateTimeField(default=timezone.now)
     is_evaluated = models.BooleanField(default=True)
     obtained_marks = models.IntegerField(null=True, blank=True)

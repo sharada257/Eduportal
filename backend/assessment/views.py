@@ -393,8 +393,12 @@ class SubmissionViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         """Create new submission with validation"""
         try:
+            print("Payload received:", request.data)  # <-- log request
             serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
+            if not serializer.is_valid():
+                print("Validation errors:", serializer.errors)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            print("Validated data:", serializer.validated_data)
             
             # Set student from current user if not provided
             if not serializer.validated_data.get('student'):
