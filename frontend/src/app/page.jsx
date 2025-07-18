@@ -20,9 +20,10 @@ export default function Home() {
 
   return (
     <div>
-      {userType === "Student" && <StudentPage />}
-      {userType === "teacher" && <Teacher />}
-      {userType === "admin" && <AdminDashboardMain />}
+      {/* {userType === "Student" && <StudentPage />} */}
+      {/* {userType === "teacher" && <Teacher />} */}
+      {/* {userType === "admin" && <AdminDashboardMain />} */}
+      <Teacher/>
     </div>
   );
 }

@@ -42,8 +42,14 @@ export default function CourseManagement() {
     getCoursesByTeacher(teacherId);
   }, [teacherId]);
 
-  const [selectedCourse, setSelectedCourse] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState([]);
   const [showAddNote, setShowAddNote] = useState(true);
+  const [newNote, setNewNote] = useState({
+    title: "",  
+    type: "lecture",
+    content: "",
+    date: new Date().toISOString().split("T")[0], // Default to today
+  });
   console.log(courses);
   return (
     <div className="space-y-6">

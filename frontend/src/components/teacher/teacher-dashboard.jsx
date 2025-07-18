@@ -14,7 +14,6 @@ import Settings from "./settings";
 export default function TeacherDashboard() {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   const [courses, setCourses] = useState([
     {
       id: 1,

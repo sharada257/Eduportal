@@ -161,7 +161,11 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-
+AUTHENTICATION_BACKENDS = [
+    'account.backend.EmailBackend',  # Custom email backend
+    'django.contrib.auth.backends.ModelBackend',    
+]
+    
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
