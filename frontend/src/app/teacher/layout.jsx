@@ -1,4 +1,4 @@
-import Sidebar from "@/components/student/sidebar";
+import Sidebar from "@/components/teacher/sidebar";
 
 /**
  * This is a Server Component by default.
