@@ -7,23 +7,22 @@ import { useRouter } from "next/navigation";
 import useAuthStore from "@/stores/authStore";
 
 export default function Home() {
-  // const router = useRouter();
-  // const user = useAuthStore((state) => state.user); 
-  // const userType = useAuthStore((state) => state.userType);
-  // console.log("User Type:", userType);
-  // console.log("User:", user);
-  // useEffect(() => {
-  //   if (user === null) {
-  //     router.push("/login");
-  //   }
-  // }, [user, router]);
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user); 
+  const userType = useAuthStore((state) => state.userType);
+  console.log("User Type:", userType);
+  console.log("User:", user);
+  useEffect(() => {
+    if (user === null) {
+      router.push("/login");
+    }
+  }, [user, router]);
 
   return (
     <div>
-    {/* //   {userType === "Student" && <StudentPage />} 
-    //  {userType === "Tacher" && <Teacher />}
-    //   {userType === "admin" && <AdminDashboardMain />} */}
-    <Dashboard/>
+      {userType === "Student" && <StudentPage />} 
+      {userType === "Teacher" && <Dashboard />}
+      {userType === "admin" && <AdminDashboardMain />}
     </div>
   );
 }

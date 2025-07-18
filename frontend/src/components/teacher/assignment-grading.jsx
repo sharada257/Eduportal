@@ -69,7 +69,7 @@ export default function AssignmentGrading({
     setGradingSubmission(null);
   };
 
-  const filteredAssignments = assignments.filter((assignment) => {
+  const filteredAssignments = assignments?.filter((assignment) => {
     const matchesCourse =
       selectedCourse === "all" || assignment.course === selectedCourse;
     const matchesSearch = assignment.title
@@ -120,7 +120,7 @@ export default function AssignmentGrading({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Courses</SelectItem>
-                {courses.map((course) => (
+                {courses?.map((course) => (
                   <SelectItem key={course.id} value={course.code}>
                     {course.name}
                   </SelectItem>
@@ -143,7 +143,7 @@ export default function AssignmentGrading({
       {!selectedAssignment ? (
         /* Assignment List */
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {filteredAssignments.map((assignment) => {
+          {filteredAssignments?.map((assignment) => {
             const stats = getSubmissionStats(assignment);
             const isOverdue = new Date(assignment.dueDate) < new Date();
 

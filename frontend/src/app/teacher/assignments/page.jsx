@@ -1,5 +1,5 @@
 "use client";
-import AssignmentGrading from "@/component/teacher/assignment-grading";
+import AssignmentGrading from "@/components/teacher/assignment-grading";
 
 export default function StudentAssignmentsPage() {
   return <AssignmentGrading />;

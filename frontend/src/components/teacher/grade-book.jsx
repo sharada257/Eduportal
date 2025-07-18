@@ -157,7 +157,7 @@ export default function GradeBook({ courses, students }) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Courses</SelectItem>
-                  {courses.map((course) => (
+                  {courses?.map((course) => (
                     <SelectItem key={course.id} value={course.code}>
                       {course.name} ({course.code})
                     </SelectItem>

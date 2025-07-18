@@ -6,9 +6,9 @@ import { BookOpen, Users, ClipboardCheck, TrendingUp, Calendar, Bell } from "luc
 
 
 export default function Dashboard({ courses, students, assignments }) {
-  const totalStudents = students.length
-  const pendingGrades = assignments.reduce((acc, assignment) => {
-    return acc + assignment.submissions.filter((s) => s.grade === null).length
+  const totalStudents = students?.length
+  const pendingGrades = assignments?.reduce((acc, assignment) => {
+    return acc + assignment.submissions?.filter((s) => s.grade === null).length
   }, 0)
 
   const upcomingDeadlines = [
@@ -36,7 +36,7 @@ export default function Dashboard({ courses, students, assignments }) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Courses</p>
-                <p className="text-2xl font-bold text-gray-900">{courses.length}</p>
+                <p className="text-2xl font-bold text-gray-900">{courses?.length}</p>
               </div>
               <BookOpen className="w-8 h-8 text-blue-600" />
             </div>

@@ -31,7 +31,7 @@ export default function Students({ courses }) {
   console.log(profile);
 
   useEffect(() => {
-    fetchStudents(profile.teacher_id);
+    fetchStudents(profile?.teacher_id);
   }, [fetchStudents]);
   console.log(students);
 
@@ -163,7 +163,7 @@ export default function Students({ courses }) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Courses</SelectItem>
-                  {courses.map((course) => (
+                  {courses?.map((course) => (
                     <SelectItem key={course.id} value={course.code}>
                       {course.code}
                     </SelectItem>
